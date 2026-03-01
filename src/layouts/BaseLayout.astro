@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import SidebarTimeline from '../components/SidebarTimeline.astro';
 
 interface Props {
   title: string;
@@ -21,7 +22,7 @@ const {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/avatar.png" />
     <meta name="generator" content={Astro.generator} />
     
     <!-- SEO / OpenGraph Tags -->
@@ -35,7 +36,7 @@ const {
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Theme Inline Script to prevent FOUC -->
     <script is:inline>
@@ -50,12 +51,34 @@ const {
     </script>
   </head>
   <body>
-    <div class="container">
-      <Header />
-      <main>
+    <SidebarTimeline />
+    <main class="main-content">
+      <div class="content-inner container">
+        <Header />
         <slot />
-      </main>
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </main>
+
+    <style is:global>
+      .main-content {
+        padding-top: 2rem;
+        transition: padding 0.3s ease;
+      }
+
+      @media (min-width: 1200px) {
+        .main-content {
+          padding-left: 12rem; /* Give space for the timeline sidebar */
+        }
+      }
+
+      .content-inner {
+          max-width: 1200px !important;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+      }
+    </style>
   </body>
 </html>

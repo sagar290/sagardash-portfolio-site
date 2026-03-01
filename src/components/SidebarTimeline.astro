@@ -1,0 +1,153 @@
+---
+const navLinks = [
+  { href: '/#about', label: 'About', id: 'about' },
+  { href: '/#experience', label: 'Experience', id: 'experience' },
+  { href: '/#skills', label: 'Skills', id: 'skills' },
+  { href: '/#open-source', label: 'OS', id: 'open-source' },
+  { href: '/#projects', label: 'Projects', id: 'projects' },
+  { href: '/articles', label: 'Articles', id: 'articles' },
+];
+---
+
+<aside class="sidebar-timeline">
+  <div class="timeline-container">
+    <div class="timeline-line"></div>
+    <nav class="timeline-nav">
+      <ul class="timeline-list">
+        {navLinks.map((link) => (
+          <li class="timeline-item">
+            <a href={link.href} class="timeline-link" data-section={link.id}>
+              <span class="timeline-node"></span>
+              <span class="timeline-label">{link.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .sidebar-timeline {
+    display: none;
+    position: fixed;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+  }
+
+  @media (min-width: 1200px) {
+    .sidebar-timeline {
+      display: block;
+    }
+  }
+
+  .timeline-container {
+    position: relative;
+    padding-left: 1.5rem;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border-color);
+    opacity: 0.5;
+  }
+
+  .timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .timeline-item {
+    position: relative;
+  }
+
+  .timeline-link {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  .timeline-node {
+    position: absolute;
+    left: -1.5rem;
+    width: 10px;
+    height: 10px;
+    background: var(--bg-color);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+
+  .timeline-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .timeline-link:hover,
+  .timeline-link.active {
+    opacity: 1;
+  }
+
+  .timeline-link:hover .timeline-node,
+  .timeline-link.active .timeline-node {
+    border-color: var(--brand-color);
+    background: var(--brand-color);
+    box-shadow: 0 0 10px rgba(var(--brand-rgb), 0.5);
+    width: 12px;
+    height: 12px;
+  }
+
+  .timeline-link.active .timeline-label {
+    color: var(--brand-color);
+  }
+</style>
+
+<script>
+  const observerOptions = {
+    root: null,
+    rootMargin: '-20% 0px -70% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        updateActiveLink(id);
+      }
+    });
+  }, observerOptions);
+
+  function updateActiveLink(id: string) {
+    const links = document.querySelectorAll('.timeline-link');
+    links.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('data-section') === id) {
+        link.classList.add('active');
+      }
+    });
+  }
+
+  // Observe all sections that have IDs
+  document.querySelectorAll('section[id]').forEach(section => {
+    observer.observe(section);
+  });
+</script>
