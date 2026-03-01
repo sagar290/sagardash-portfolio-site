@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { Content as AboutContent } from '../content/about.md';
+import Parser from 'rss-parser';
 
 const allProjects = await getCollection('projects');
 const sortedProjects = allProjects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -21,6 +22,40 @@ const sortedSkills = allSkills.sort((a, b) => a.data.order - b.data.order);
 
 const allOpenSource = await getCollection('opensource');
 const sortedOpenSource = allOpenSource.sort((a, b) => a.data.order - b.data.order);
+
+// Fetch Articles
+const localArticles = await getCollection('articles');
+const MEDIUM_RSS_URL = 'https://medium.com/feed/@sagar-dash290';
+const parser = new Parser();
+let mediumArticles = [];
+
+try {
+  const feed = await parser.parseURL(MEDIUM_RSS_URL);
+  mediumArticles = feed.items.map(item => {
+    const wordCount = item['content:encoded']?.split(/\s+/).length || 0;
+    const readingTime = Math.ceil(wordCount / 200) || 1;
+    return {
+      title: item.title,
+      link: item.link,
+      date: new Date(item.pubDate!),
+      readingTime: `${readingTime} min read`,
+      source: 'Medium'
+    };
+  });
+} catch (error) {
+  console.warn("Could not fetch medium articles during build.");
+}
+
+const allArticles = [
+  ...localArticles.map(a => ({
+    title: a.data.title,
+    link: a.data.link || `/articles/${a.slug}`,
+    date: a.data.date,
+    readingTime: 'Local',
+    source: 'Local'
+  })),
+  ...mediumArticles
+].sort((a, b) => b.date.valueOf() - a.date.valueOf());
 ---
 
 <BaseLayout title="Sagar Dash | Senior Software Engineer">
@@ -36,7 +71,7 @@ const sortedOpenSource = allOpenSource.sort((a, b) => a.data.order - b.data.orde
       </p>
       <div class="hero-actions">
         <a href="#contact" class="btn btn-primary">Get in Touch</a>
-        <a href="/articles" class="btn btn-outline">View Articles</a>
+        <a href="https://drive.google.com/file/d/1k70KEsPsYb5eiD9SgqED2Ejrecskz_v3/view" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Download CV</a>
       </div>
     </div>
     <div class="hero-avatar">
@@ -144,9 +179,32 @@ const sortedOpenSource = allOpenSource.sort((a, b) => a.data.order - b.data.orde
   <!-- Articles Section -->
   <section id="articles" class="section">
     <h2 class="section-title">Latest Articles</h2>
-    <p>I write about backend engineering, Go, and system design.</p>
-    <div style="margin-top: 2rem;">
-      <a href="/articles" class="btn btn-outline">Read All Articles</a>
+    <p class="section-subtitle">Thoughts, opinions, and technical tutorials.</p>
+    
+    <div class="carousel-container">
+      <div class="carousel-track" id="articles-carousel">
+        {allArticles.map(article => (
+          <div class="carousel-item">
+            <a href={article.link} target="_blank" rel="noopener noreferrer" class="article-card-mini">
+              <div class="article-meta-mini">
+                <span class="source-tag-mini">{article.source}</span>
+                <span class="read-time-mini">{article.readingTime}</span>
+              </div>
+              <h3 class="article-title-mini">{article.title}</h3>
+              <time class="article-date-mini">
+                {article.date.toLocaleDateString('en-US', {
+                  month: 'short', day: 'numeric', year: 'numeric'
+                })}
+              </time>
+            </a>
+          </div>
+        ))}
+      </div>
+      
+      <div class="carousel-controls">
+        <button class="carousel-btn prev" aria-label="Previous articles">&larr;</button>
+        <button class="carousel-btn next" aria-label="Next articles">&rarr;</button>
+      </div>
     </div>
   </section>
 
@@ -547,6 +605,129 @@ const sortedOpenSource = allOpenSource.sort((a, b) => a.data.order - b.data.orde
     font-weight: 500;
   }
 
+  /* Carousel Styles */
+  .carousel-container {
+    position: relative;
+    margin-top: 2rem;
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    scroll-behavior: smooth;
+    padding: 1rem 0;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+
+  .carousel-track::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .carousel-item {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  @media (min-width: 768px) {
+    .carousel-item {
+      flex: 0 0 calc(50% - 0.75rem);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .carousel-item {
+      flex: 0 0 calc(25% - 1.125rem);
+    }
+  }
+
+  .article-card-mini {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+
+  .article-card-mini:hover {
+    transform: translateY(-5px);
+    border-color: var(--brand-color);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+
+  .article-meta-mini {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+
+  .source-tag-mini {
+    font-weight: 700;
+    color: var(--brand-color);
+    text-transform: uppercase;
+  }
+
+  .article-title-mini {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: auto;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-date-mini {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin-top: 1rem;
+  }
+
+  .carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .carousel-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+  }
+
+  .carousel-btn:hover {
+    background: var(--brand-color);
+    color: white;
+    border-color: var(--brand-color);
+    transform: scale(1.1);
+  }
+
+  .section-subtitle {
+    opacity: 0.7;
+    margin-bottom: 2rem;
+  }
+
   /* Contact Form */
   .contact-form {
     background: var(--card-bg);
@@ -581,4 +762,166 @@ const sortedOpenSource = allOpenSource.sort((a, b) => a.data.order - b.data.orde
       grid-template-columns: 1fr;
     }
   }
+
+  /* Carousel Styles */
+  .carousel-container {
+    position: relative;
+    margin-top: 2rem;
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 1.5rem;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    scroll-behavior: smooth;
+    padding: 1rem 0;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+
+  .carousel-track::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .carousel-item {
+    flex: 0 0 100%;
+    min-width: 0;
+  }
+
+  @media (min-width: 768px) {
+    .carousel-item {
+      flex: 0 0 calc(50% - 0.75rem);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .carousel-item {
+      flex: 0 0 calc(25% - 1.125rem);
+    }
+  }
+
+  .article-card-mini {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--text-color);
+  }
+
+  .article-card-mini:hover {
+    transform: translateY(-5px);
+    border-color: var(--brand-color);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+
+  .article-meta-mini {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+
+  .source-tag-mini {
+    font-weight: 700;
+    color: var(--brand-color);
+    text-transform: uppercase;
+  }
+
+  .article-title-mini {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: auto;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-date-mini {
+    font-size: 0.8rem;
+    opacity: 0.6;
+    margin-top: 1rem;
+  }
+
+  .carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .carousel-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+  }
+
+  .carousel-btn:hover {
+    background: var(--brand-color);
+    color: white;
+    border-color: var(--brand-color);
+    transform: scale(1.1);
+  }
+
+  .section-subtitle {
+    opacity: 0.7;
+    margin-bottom: 2rem;
+  }
 </style>
+
+<script>
+  // Carousel Navigation Logic
+  const track = document.getElementById('articles-carousel') as HTMLElement;
+  const prevBtn = document.querySelector('.carousel-btn.prev') as HTMLButtonElement;
+  const nextBtn = document.querySelector('.carousel-btn.next') as HTMLButtonElement;
+
+  if (track && prevBtn && nextBtn) {
+    const getScrollAmount = () => {
+      const itemWidth = track.querySelector('.carousel-item')?.getBoundingClientRect().width || 0;
+      const gap = 24; // 1.5rem
+      return itemWidth + gap;
+    };
+
+    nextBtn.addEventListener('click', () => {
+      track.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+    });
+
+    prevBtn.addEventListener('click', () => {
+      track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+    });
+
+    // Optional: Hide arrows if at start/end
+    track.addEventListener('scroll', () => {
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      prevBtn.style.opacity = track.scrollLeft <= 5 ? '0.3' : '1';
+      prevBtn.style.pointerEvents = track.scrollLeft <= 5 ? 'none' : 'auto';
+      
+      nextBtn.style.opacity = track.scrollLeft >= maxScroll - 5 ? '0.3' : '1';
+      nextBtn.style.pointerEvents = track.scrollLeft >= maxScroll - 5 ? 'none' : 'auto';
+    });
+    
+    // Initial state
+    setTimeout(() => {
+        track.dispatchEvent(new Event('scroll'));
+    }, 100);
+  }
+</script>
+

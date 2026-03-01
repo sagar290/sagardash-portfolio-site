@@ -19,6 +19,7 @@ const articlesCollection = defineCollection({
     description: z.string(),
     date: z.date(),
     tags: z.array(z.string()).optional(),
+    link: z.string().url().optional(),
   }),
 });
 
