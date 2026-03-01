@@ -1,0 +1,112 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const articleEntries = await getCollection('articles');
+  return articleEntries.map(entry => ({
+    params: { slug: entry.slug }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BaseLayout 
+  title={`${entry.data.title} | Articles`} 
+  description={entry.data.description}
+>
+  <article class="article-layout animate-in">
+    <header class="article-header">
+      <a href="/articles" class="back-link">&larr; Back to Articles</a>
+      <h1 class="article-title">{entry.data.title}</h1>
+      <div class="article-meta">
+        <time datetime={entry.data.date.toISOString()}>
+          {entry.data.date.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+          })}
+        </time>
+        {entry.data.tags && (
+          <div class="article-tags">
+            {entry.data.tags.map(tag => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <div class="article-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article-layout {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 0 6rem;
+  }
+  .back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: var(--brand-color);
+    font-weight: 500;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+  .article-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+  .article-tags {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .tag {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  :global(.article-content h1) {
+    display: none; /* Hide H1 since it's already in the header */
+  }
+  :global(.article-content h2) {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  :global(.article-content p) {
+    margin-bottom: 1.5rem;
+  }
+  :global(.article-content ul) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  :global(.article-content li) {
+    margin-bottom: 0.5rem;
+  }
+</style>

@@ -1,0 +1,122 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const projectEntries = await getCollection('projects');
+  return projectEntries.map(entry => ({
+    params: { slug: entry.slug }, props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BaseLayout 
+  title={`${entry.data.title} | Projects`} 
+  description={entry.data.description}
+>
+  <article class="project-layout animate-in">
+    <header class="project-header">
+      <a href="/#projects" class="back-link">&larr; Back to Projects</a>
+      <h1 class="project-title">{entry.data.title}</h1>
+      <div class="project-meta">
+        <time datetime={entry.data.date.toISOString()}>
+          {entry.data.date.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+          })}
+        </time>
+        <div class="project-tags">
+          {entry.data.tags.map(tag => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      </div>
+      {entry.data.coverImage && (
+        <img src={entry.data.coverImage} alt={entry.data.title} class="cover-image" />
+      )}
+    </header>
+
+    <div class="project-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .project-layout {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 0 6rem;
+  }
+  .back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: var(--brand-color);
+    font-weight: 500;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+  .project-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+  .project-tags {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .tag {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .cover-image {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin-bottom: 3rem;
+  }
+
+  .project-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  :global(.project-content h2) {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  :global(.project-content h3) {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+  }
+  :global(.project-content p) {
+    margin-bottom: 1.5rem;
+  }
+  :global(.project-content ul, .project-content ol) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  :global(.project-content li) {
+    margin-bottom: 0.5rem;
+  }
+</style>
