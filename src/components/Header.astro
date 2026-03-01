@@ -8,19 +8,55 @@ const navLinks = [
   { href: '/#open-source', label: 'OS' },
   { href: '/#projects', label: 'Projects' },
   { href: '/articles', label: 'Articles' },
-  { href: '/#contact', label: 'Contact' },
 ];
 ---
 
 <header class="header">
-  <div class="header-inner">
-    <a href="/" class="logo">Sagar Dash</a>
-    <nav class="nav">
-      <ul class="nav-list">
+  <div class="container">
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <span class="logo-text">Sagar Dash</span>
+      </a>
+      
+      <nav class="desktop-nav">
+        <ul class="nav-links">
+          {navLinks.map((link) => (
+            <li>
+              <a href={link.href} class="nav-link">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div class="nav-divider"></div>
+        <div class="nav-actions">
+          <ThemeToggle />
+          <a href="/#contact" class="contact-btn">Contact</a>
+        </div>
+      </nav>
+
+      <div class="mobile-actions">
+        <ThemeToggle />
+        <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+          <span class="hamburger"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mobile-menu" class="mobile-menu">
+    <nav class="mobile-nav">
+      <ul class="mobile-links">
         {navLinks.map((link) => (
-          <li><a href={link.href} class="nav-link">{link.label}</a></li>
+          <li>
+            <a href={link.href} class="mobile-link">
+              {link.label}
+            </a>
+          </li>
         ))}
-        <li><ThemeToggle /></li>
+        <li>
+          <a href="/#contact" class="mobile-contact-btn">Contact Me</a>
+        </li>
       </ul>
     </nav>
   </div>
@@ -30,40 +66,261 @@ const navLinks = [
   .header {
     position: sticky;
     top: 0;
-    z-index: 100;
-    background: var(--nav-bg);
-    backdrop-filter: blur(8px);
+    z-index: 1000;
+    background: rgba(var(--bg-rgb, 255, 255, 255), 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--border-color);
-    padding: 1rem 0;
+    transition: all 0.3s ease;
   }
+
   .header-inner {
+    height: 72px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
+
   .logo {
-    font-weight: 700;
-    font-size: 1.25rem;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: transform 0.2s ease;
   }
-  .nav-list {
+
+  .logo:hover {
+    transform: scale(1.02);
+  }
+
+  .logo-text {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--brand-color), #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Desktop Nav Styling */
+  .desktop-nav {
+    display: none;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .desktop-nav {
+      display: flex;
+    }
+  }
+
+  .nav-links {
     display: flex;
     list-style: none;
     gap: 1.5rem;
-    align-items: center;
-  }
-  .nav-link {
-    font-weight: 500;
-    color: var(--text-color);
-    opacity: 0.8;
-    transition: opacity 0.2s ease;
-  }
-  .nav-link:hover {
-    opacity: 1;
+    padding: 0;
+    margin: 0;
   }
 
-  @media (max-width: 600px) {
-    .nav-list {
-      gap: 1rem;
+  .nav-link {
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.6;
+    transition: all 0.2s ease;
+    position: relative;
+    padding: 0.5rem 0;
+  }
+
+  .nav-link:hover {
+    opacity: 1;
+    color: var(--brand-color);
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--brand-color);
+    transition: width 0.3s ease;
+    border-radius: 2px;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  .nav-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-color);
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .contact-btn {
+    background: var(--brand-color);
+    color: white !important;
+    padding: 0.6rem 1.25rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(var(--brand-rgb, 0, 112, 243), 0.2);
+  }
+
+  .contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(var(--brand-rgb, 0, 112, 243), 0.3);
+    filter: brightness(1.1);
+  }
+
+  /* Mobile Actions & Menu Toggle */
+  .mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 1024px) {
+    .mobile-actions {
+      display: none;
     }
   }
+
+  .menu-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 1001;
+  }
+
+  .hamburger {
+    display: block;
+    position: relative;
+    width: 24px;
+    height: 2px;
+    background: var(--text-color);
+    transition: all 0.3s ease;
+  }
+
+  .hamburger::before,
+  .hamburger::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 2px;
+    background: var(--text-color);
+    transition: all 0.3s ease;
+  }
+
+  .hamburger::before { top: -8px; }
+  .hamburger::after { bottom: -8px; }
+
+  /* Open State for Hamburger */
+  .menu-open .hamburger { background: transparent; }
+  .menu-open .hamburger::before { transform: rotate(45deg); top: 0; }
+  .menu-open .hamburger::after { transform: rotate(-45deg); bottom: 0; }
+
+  /* Mobile Menu Container */
+  .mobile-menu {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 72px);
+    background: var(--bg-color);
+    z-index: 999;
+    transform: translateY(-100%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 2rem;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .mobile-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .mobile-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .mobile-link {
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    transition: color 0.2s ease;
+  }
+
+  .mobile-link:hover {
+    color: var(--brand-color);
+  }
+
+  .mobile-contact-btn {
+    margin-top: 1rem;
+    background: var(--brand-color);
+    color: white !important;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    display: block;
+  }
 </style>
+
+<script>
+  const toggleBtn = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const body = document.body;
+  const mobileLinks = document.querySelectorAll('.mobile-link, .mobile-contact-btn');
+
+  function toggleMenu() {
+    mobileMenu?.classList.toggle('open');
+    toggleBtn?.classList.toggle('menu-open');
+    body.style.overflow = mobileMenu?.classList.contains('open') ? 'hidden' : '';
+  }
+
+  toggleBtn?.addEventListener('click', toggleMenu);
+
+  mobileLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (mobileMenu?.classList.contains('open')) {
+        toggleMenu();
+      }
+    });
+  });
+
+  // Handle outside click
+  window.addEventListener('click', (e) => {
+    if (mobileMenu?.classList.contains('open') && 
+        !mobileMenu.contains(e.target as Node) && 
+        !toggleBtn?.contains(e.target as Node)) {
+      toggleMenu();
+    }
+  });
+</script>

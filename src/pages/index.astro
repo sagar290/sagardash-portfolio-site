@@ -5,6 +5,22 @@ import { Content as AboutContent } from '../content/about.md';
 
 const allProjects = await getCollection('projects');
 const sortedProjects = allProjects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const allExperience = await getCollection('experience');
+const sortedExperience = allExperience.sort((a, b) => a.data.order - b.data.order);
+// Render markdown content for experience highlights
+const experienceWithContent = await Promise.all(
+  sortedExperience.map(async (entry) => {
+    const { Content } = await entry.render();
+    return { ...entry, Content };
+  })
+);
+
+const allSkills = await getCollection('skills');
+const sortedSkills = allSkills.sort((a, b) => a.data.order - b.data.order);
+
+const allOpenSource = await getCollection('opensource');
+const sortedOpenSource = allOpenSource.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <BaseLayout title="Sagar Dash | Senior Software Engineer">
@@ -41,39 +57,20 @@ const sortedProjects = allProjects.sort((a, b) => b.data.date.valueOf() - a.data
     <h2 class="section-title">Experience</h2>
     <div class="experience-list">
       
-      <div class="experience-item">
-        <div class="experience-header">
-          <div>
-            <h3 class="experience-role">Senior Software Engineer</h3>
-            <p class="experience-company">Pathao</p>
+      {experienceWithContent.map(exp => (
+        <div class="experience-item">
+          <div class="experience-header">
+            <div>
+              <h3 class="experience-role">{exp.data.role}</h3>
+              <p class="experience-company">{exp.data.company}</p>
+            </div>
+            <span class="experience-period">{exp.data.period}</span>
           </div>
-          <span class="experience-period">Sept 2023 - Present</span>
-        </div>
-        <p class="experience-desc">Backend Engineer leading Go-based distributed services powering logistics and merchant systems in a high-traffic super app.</p>
-        <ul class="experience-highlights">
-          <li>Design and maintain system architecture</li>
-          <li>Lead incident response and root cause analysis</li>
-          <li>Optimize high-load endpoints using goroutines (40% latency improvement)</li>
-          <li>Mentor junior engineers on distributed systems</li>
-        </ul>
-      </div>
-
-      <div class="experience-item">
-        <div class="experience-header">
-          <div>
-            <h3 class="experience-role">Lead Specialist, Engineering</h3>
-            <p class="experience-company">10 Minute School</p>
+          <div class="experience-desc experience-highlights">
+            <exp.Content />
           </div>
-          <span class="experience-period">Sept 2017 - Sept 2023</span>
         </div>
-        <p class="experience-desc">Full-stack developer at Bangladesh's fastest-growing EdTech startup. Collaborated with Product and Mobile teams on complex system architectures.</p>
-        <ul class="experience-highlights">
-          <li>Architected Live Class backend for 1,000+ concurrent users</li>
-          <li>Designed robust payment system with RabbitMQ</li>
-          <li>Built high-concurrency quiz engine for massive traffic spikes</li>
-          <li>Developed CRM dashboard for operational efficiency</li>
-        </ul>
-      </div>
+      ))}
 
     </div>
   </section>
@@ -83,57 +80,16 @@ const sortedProjects = allProjects.sort((a, b) => b.data.date.valueOf() - a.data
     <h2 class="section-title">Skills</h2>
     <div class="skills-grid">
       
-      <div class="skill-category">
-        <h3 class="category-title">Backend Frameworks</h3>
-        <div class="skill-tags">
-          <span class="tag">Go</span>
-          <span class="tag">Nest.js</span>
-          <span class="tag">Gin</span>
-          <span class="tag">Go Chi</span>
-          <span class="tag">Laravel</span>
+      {sortedSkills.map(category => (
+        <div class="skill-category">
+          <h3 class="category-title">{category.data.title}</h3>
+          <div class="skill-tags">
+            {category.data.skills.map(skill => (
+              <span class="tag">{skill}</span>
+            ))}
+          </div>
         </div>
-      </div>
-
-      <div class="skill-category">
-        <h3 class="category-title">Cloud & DevOps</h3>
-        <div class="skill-tags">
-          <span class="tag">Docker</span>
-          <span class="tag">Kubernetes</span>
-          <span class="tag">Terraform</span>
-          <span class="tag">AWS</span>
-          <span class="tag">GCP</span>
-          <span class="tag">Github Actions</span>
-        </div>
-      </div>
-
-      <div class="skill-category">
-        <h3 class="category-title">Message Queues & Search</h3>
-        <div class="skill-tags">
-          <span class="tag">RabbitMQ</span>
-          <span class="tag">AWS SQS</span>
-          <span class="tag">Elasticsearch</span>
-        </div>
-      </div>
-
-      <div class="skill-category">
-        <h3 class="category-title">Databases & Caching</h3>
-        <div class="skill-tags">
-          <span class="tag">Redis</span>
-          <span class="tag">PostgreSQL</span>
-          <span class="tag">MySQL</span>
-          <span class="tag">MongoDB</span>
-        </div>
-      </div>
-
-      <div class="skill-category">
-        <h3 class="category-title">Other Languages</h3>
-        <div class="skill-tags">
-          <span class="tag">PHP</span>
-          <span class="tag">JavaScript</span>
-          <span class="tag">Python</span>
-          <span class="tag">TypeScript</span>
-        </div>
-      </div>
+      ))}
 
     </div>
   </section>
@@ -143,37 +99,15 @@ const sortedProjects = allProjects.sort((a, b) => b.data.date.valueOf() - a.data
     <h2 class="section-title">Open Source</h2>
     <div class="os-grid">
       
-      <a href="https://github.com/pathao-eng/courier-woocommerce-plugin/activity?actor=sagar290" target="_blank" rel="noopener noreferrer" class="os-card">
-        <div class="os-header">
-          <h3 class="os-title">Pathao Courier Woocommerce Plugin</h3>
-          <span class="os-role author">Author</span>
-        </div>
-        <p class="os-desc">Integration plugin for Woocommerce</p>
-      </a>
-
-      <a href="https://github.com/sagar290/migo" target="_blank" rel="noopener noreferrer" class="os-card">
-        <div class="os-header">
-          <h3 class="os-title">Migo</h3>
-          <span class="os-role author">Author</span>
-        </div>
-        <p class="os-desc">Open source project</p>
-      </a>
-
-      <a href="https://github.com/hoppscotch/hoppscotch/pull/2556" target="_blank" rel="noopener noreferrer" class="os-card">
-        <div class="os-header">
-          <h3 class="os-title">Hoppscotch</h3>
-          <span class="os-role contributor">Contributor</span>
-        </div>
-        <p class="os-desc">API development platform</p>
-      </a>
-
-      <a href="https://github.com/Shipu/watchable/pull/4" target="_blank" rel="noopener noreferrer" class="os-card">
-        <div class="os-header">
-          <h3 class="os-title">Watchable</h3>
-          <span class="os-role contributor">Contributor</span>
-        </div>
-        <p class="os-desc">Open source project</p>
-      </a>
+      {sortedOpenSource.map(project => (
+        <a href={project.data.link} target="_blank" rel="noopener noreferrer" class="os-card">
+          <div class="os-header">
+            <h3 class="os-title">{project.data.title}</h3>
+            <span class={`os-role ${project.data.role.toLowerCase()}`}>{project.data.role}</span>
+          </div>
+          <p class="os-desc">{project.data.description}</p>
+        </a>
+      ))}
 
     </div>
   </section>
@@ -358,22 +292,29 @@ const sortedProjects = allProjects.sort((a, b) => b.data.date.valueOf() - a.data
     opacity: 0.9;
   }
   .experience-desc {
-    margin: 1rem 0;
+    margin: 1rem 0 0 0;
     font-size: 1rem;
     line-height: 1.6;
     opacity: 0.8;
   }
   .experience-highlights {
-    padding-left: 1.25rem;
+    padding-left: 0;
     font-size: 0.95rem;
     opacity: 0.8;
     list-style-type: none; /* Custom bullets */
   }
-  .experience-highlights li {
+  :global(.experience-highlights p) {
+    margin-bottom: 0.5rem;
+  }
+  :global(.experience-highlights ul) {
+    list-style: none;
+    padding-left: 1.25rem;
+  }
+  :global(.experience-highlights li) {
     margin-bottom: 0.5rem;
     position: relative;
   }
-  .experience-highlights li::before {
+  :global(.experience-highlights li::before) {
     content: '→';
     position: absolute;
     left: -1.25rem;
