@@ -1,0 +1,63 @@
+---
+const { 
+  children,
+  duration = 2000,
+  rx = "1",
+  ry = "1",
+  className = "",
+  containerClassName = "",
+  borderClassName = ""
+} = Astro.props;
+---
+
+<div class={containerClassName + " moving-border-container relative group rounded-2xl p-[1px] overflow-hidden bg-transparent"}>
+  <div class={borderClassName + " moving-border absolute inset-0 z-0"}></div>
+  <div class={className + " relative z-10 bg-white dark:bg-gray-900 rounded-[calc(1rem-1px)] overflow-hidden"}>
+    <slot />
+  </div>
+</div>
+
+<style>
+  .moving-border-container {
+    background: radial-gradient(
+      800px circle at var(--mouse-x) var(--mouse-y),
+      rgba(255, 255, 255, 0.06),
+      transparent 40%
+    );
+  }
+
+  .moving-border {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 112, 243, 0.6),
+      rgba(139, 92, 246, 0.6),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: moveBorder 3s linear infinite;
+  }
+
+  @keyframes moveBorder {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+</style>
+
+<script>
+  const container = document.querySelector('.moving-border-container') as HTMLElement;
+  
+  if (container) {
+    container.addEventListener('mousemove', (e: MouseEvent) => {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      container.style.setProperty('--mouse-x', `${x}px`);
+      container.style.setProperty('--mouse-y', `${y}px`);
+    });
+  }
+</script>

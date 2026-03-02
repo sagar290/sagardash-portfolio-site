@@ -1,0 +1,78 @@
+---
+const { class: className = Astro.props.className || "" } = Astro.props;
+---
+
+<div class={className + " hero-highlight relative"}>
+  <div class="hero-highlight-content relative z-10">
+    <slot />
+  </div>
+  <div
+    class="hero-highlight-gradient absolute inset-0 overflow-hidden pointer-events-none"
+  >
+    <div class="gradient-blob gradient-blob-1"></div>
+    <div class="gradient-blob gradient-blob-2"></div>
+    <div class="gradient-blob gradient-blob-3"></div>
+  </div>
+</div>
+
+<style>
+  .hero-highlight {
+    background: var(--bg-color);
+  }
+
+  .gradient-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .gradient-blob-1 {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, var(--brand-color), #8b5cf6);
+    top: -100px;
+    right: -100px;
+    animation-delay: 0s;
+  }
+
+  .gradient-blob-2 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #ec4899, #8b5cf6);
+    bottom: -50px;
+    left: -50px;
+    animation-delay: -5s;
+  }
+
+  .gradient-blob-3 {
+    width: 250px;
+    height: 250px;
+    background: linear-gradient(135deg, #06b6d4, var(--brand-color));
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -10s;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    25% {
+      transform: translate(50px, -50px) scale(1.1);
+    }
+    50% {
+      transform: translate(-30px, 30px) scale(0.9);
+    }
+    75% {
+      transform: translate(-50px, -20px) scale(1.05);
+    }
+  }
+
+  :global(.dark) .gradient-blob {
+    opacity: 0.1;
+  }
+</style>

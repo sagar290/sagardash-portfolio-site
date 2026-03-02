@@ -1,0 +1,124 @@
+---
+const { 
+  size = 10,
+  minDelay = 0.4,
+  maxDelay = 1.2,
+  minDuration = 2,
+  maxDuration = 3,
+  particleColor = "#ffffff",
+  particleDensity = 100
+} = Astro.props;
+---
+
+<div class="sparkles-container" style={`
+  --size: ${size}px;
+  --min-delay: ${minDelay}s;
+  --max-delay: ${maxDelay}s;
+  --min-duration: ${minDuration}s;
+  --max-duration: ${maxDuration}s;
+  --particle-color: ${particleColor};
+  --particle-density: ${particleDensity}px;
+`}>
+  <div class="sparkle"></div>
+</div>
+
+<style>
+  .sparkles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+    overflow: hidden;
+  }
+
+  .sparkle {
+    position: absolute;
+    background: var(--particle-color);
+    border-radius: 50%;
+    opacity: 0;
+    animation: sparkle var(--duration) ease-in-out var(--delay) infinite;
+    box-shadow: 0 0 var(--size) var(--particle-color);
+  }
+
+  @keyframes sparkle {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0);
+    }
+  }
+
+  .sparkle:nth-child(1) {
+    top: 20%;
+    left: 10%;
+    width: var(--size);
+    height: var(--size);
+    --delay: calc(var(--min-delay) + var(--index) * 0.1s);
+    --duration: calc(var(--min-duration) + var(--index) * 0.2s);
+  }
+
+  .sparkle:nth-child(2) {
+    top: 40%;
+    left: 30%;
+    width: calc(var(--size) * 0.8);
+    height: calc(var(--size) * 0.8);
+    --delay: calc(var(--min-delay) + var(--index) * 0.15s);
+    --duration: calc(var(--min-duration) + var(--index) * 0.25s);
+  }
+
+  .sparkle:nth-child(3) {
+    top: 60%;
+    left: 50%;
+    width: calc(var(--size) * 1.2);
+    height: calc(var(--size) * 1.2);
+    --delay: calc(var(--min-delay) + var(--index) * 0.2s);
+    --duration: calc(var(--min-duration) + var(--index) * 0.3s);
+  }
+
+  .sparkle:nth-child(4) {
+    top: 80%;
+    left: 70%;
+    width: var(--size);
+    height: var(--size);
+    --delay: calc(var(--min-delay) + var(--index) * 0.25s);
+    --duration: calc(var(--min-duration) + var(--index) * 0.35s);
+  }
+
+  .sparkle:nth-child(5) {
+    top: 30%;
+    left: 80%;
+    width: calc(var(--size) * 0.6);
+    height: calc(var(--size) * 0.6);
+    --delay: calc(var(--min-delay) + var(--index) * 0.3s);
+    --duration: calc(var(--min-duration) + var(--index) * 0.4s);
+  }
+</style>
+
+<script>
+  const container = document.querySelector('.sparkles-container') as HTMLElement;
+  const particleDensity = parseInt(container?.style.getPropertyValue('--particle-density') || '100');
+  
+  if (container) {
+    const rect = container.getBoundingClientRect();
+    const numParticles = Math.floor((rect.width * rect.height) / (particleDensity * particleDensity));
+    
+    for (let i = 0; i < numParticles; i++) {
+      const sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.style.setProperty('--index', i.toString());
+      sparkle.style.left = `${Math.random() * 100}%`;
+      sparkle.style.top = `${Math.random() * 100}%`;
+      container.appendChild(sparkle);
+    }
+  }
+</script>

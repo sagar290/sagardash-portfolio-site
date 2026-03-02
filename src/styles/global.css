@@ -1,3 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    /* Adjust this to match your header height */
+}
+
 :root {
     --bg-color: #ffffff;
     --bg-rgb: 255, 255, 255;

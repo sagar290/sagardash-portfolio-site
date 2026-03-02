@@ -1,14 +1,22 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { Content as AboutContent } from '../content/about.md';
-import Parser from 'rss-parser';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { Content as AboutContent } from "../content/about.md";
+import Parser from "rss-parser";
+import Sparkles from "../components/ui/Sparkles.astro";
+import MovingBorder from "../components/ui/MovingBorder.astro";
+import HeroHighlight from "../components/ui/HeroHighlight.astro";
+import MagicButton from "../components/ui/MagicButton.astro";
 
-const allProjects = await getCollection('projects');
-const sortedProjects = allProjects.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const allProjects = await getCollection("projects");
+const sortedProjects = allProjects.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
 
-const allExperience = await getCollection('experience');
-const sortedExperience = allExperience.sort((a, b) => a.data.order - b.data.order);
+const allExperience = await getCollection("experience");
+const sortedExperience = allExperience.sort(
+  (a, b) => a.data.order - b.data.order
+);
 // Render markdown content for experience highlights
 const experienceWithContent = await Promise.all(
   sortedExperience.map(async (entry) => {
@@ -17,29 +25,31 @@ const experienceWithContent = await Promise.all(
   })
 );
 
-const allSkills = await getCollection('skills');
+const allSkills = await getCollection("skills");
 const sortedSkills = allSkills.sort((a, b) => a.data.order - b.data.order);
 
-const allOpenSource = await getCollection('opensource');
-const sortedOpenSource = allOpenSource.sort((a, b) => a.data.order - b.data.order);
+const allOpenSource = await getCollection("opensource");
+const sortedOpenSource = allOpenSource.sort(
+  (a, b) => a.data.order - b.data.order
+);
 
 // Fetch Articles
-const localArticles = await getCollection('articles');
-const MEDIUM_RSS_URL = 'https://medium.com/feed/@sagar-dash290';
+const localArticles = await getCollection("articles");
+const MEDIUM_RSS_URL = "https://medium.com/feed/@sagar-dash290";
 const parser = new Parser();
-let mediumArticles = [];
+let mediumArticles: any[] = [];
 
 try {
   const feed = await parser.parseURL(MEDIUM_RSS_URL);
-  mediumArticles = feed.items.map(item => {
-    const wordCount = item['content:encoded']?.split(/\s+/).length || 0;
+  mediumArticles = feed.items.map((item) => {
+    const wordCount = item["content:encoded"]?.split(/\s+/).length || 0;
     const readingTime = Math.ceil(wordCount / 200) || 1;
     return {
       title: item.title,
       link: item.link,
       date: new Date(item.pubDate!),
       readingTime: `${readingTime} min read`,
-      source: 'Medium'
+      source: "Medium",
     };
   });
 } catch (error) {
@@ -47,41 +57,53 @@ try {
 }
 
 const allArticles = [
-  ...localArticles.map(a => ({
+  ...localArticles.map((a) => ({
     title: a.data.title,
     link: a.data.link || `/articles/${a.slug}`,
     date: a.data.date,
-    readingTime: 'Local',
-    source: 'Local'
+    readingTime: "Local",
+    source: "Local",
   })),
-  ...mediumArticles
+  ...mediumArticles,
 ].sort((a, b) => b.date.valueOf() - a.date.valueOf());
 ---
 
 <BaseLayout title="Sagar Dash | Senior Software Engineer">
   <!-- Hero Section -->
-  <section class="section hero animate-in">
-    <div class="hero-content">
-      <h1 class="hero-title">
-        Hi, I'm <span class="highlight">Sagar Dash</span><br/>
-        Senior Software Engineer
-      </h1>
-      <p class="hero-tagline">
-        Backend-focused engineer with 8+ years of experience scaling distributed systems.
-      </p>
-      <div class="hero-actions">
-        <a href="#contact" class="btn btn-primary">Get in Touch</a>
-        <a href="https://drive.google.com/file/d/1AMJCy47vP3bqVHn_gX5yRgyi_hZUmI-f/view" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Download CV</a>
-      </div>
-    </div>
-    <div class="hero-avatar">
-      <div class="avatar-frame">
-        <div class="avatar-img-container">
-          <img src="/avatar.png" alt="Sagar Dash" class="avatar-img" />
+  <HeroHighlight>
+    <div class="container relative z-10 pt-8 md:pt-0">
+      <div
+        class="section hero animate-in flex flex-col md:flex-row items-center gap-12 lg:gap-20"
+      >
+        <div class="hero-content flex-1 text-left">
+          <h1 class="hero-title leading-tight">
+            Hi, I'm <span class="highlight">Sagar Dash</span><br />
+            Senior Software Engineer
+          </h1>
+          <p class="hero-tagline max-w-xl">
+            Backend-focused engineer with 8+ years of experience scaling
+            distributed systems.
+          </p>
+          <div class="hero-actions mt-8 flex flex-wrap gap-4 relative z-20">
+            <MagicButton href="#contact">Get in Touch</MagicButton>
+            <MagicButton
+              href="https://drive.google.com/file/d/1AMJCy47vP3bqVHn_gX5yRgyi_hZUmI-f/view"
+              target="_blank"
+              rel="noopener noreferrer">Download CV</MagicButton
+            >
+          </div>
+        </div>
+        <div class="hero-avatar relative">
+          <Sparkles particleColor="var(--brand-color)" size={8} />
+          <div class="avatar-frame shrink-0">
+            <div class="avatar-img-container">
+              <img src="/avatar.png" alt="Sagar Dash" class="avatar-img" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </section>
+  </HeroHighlight>
 
   <!-- About Section -->
   <section id="about" class="section">
@@ -95,22 +117,22 @@ const allArticles = [
   <section id="experience" class="section">
     <h2 class="section-title">Experience</h2>
     <div class="experience-list">
-      
-      {experienceWithContent.map(exp => (
-        <div class="experience-item">
-          <div class="experience-header">
-            <div>
-              <h3 class="experience-role">{exp.data.role}</h3>
-              <p class="experience-company">{exp.data.company}</p>
+      {
+        experienceWithContent.map((exp) => (
+          <div class="experience-item">
+            <div class="experience-header">
+              <div>
+                <h3 class="experience-role">{exp.data.role}</h3>
+                <p class="experience-company">{exp.data.company}</p>
+              </div>
+              <span class="experience-period">{exp.data.period}</span>
             </div>
-            <span class="experience-period">{exp.data.period}</span>
+            <div class="experience-desc experience-highlights">
+              <exp.Content />
+            </div>
           </div>
-          <div class="experience-desc experience-highlights">
-            <exp.Content />
-          </div>
-        </div>
-      ))}
-
+        ))
+      }
     </div>
   </section>
 
@@ -118,18 +140,18 @@ const allArticles = [
   <section id="skills" class="section">
     <h2 class="section-title">Skills</h2>
     <div class="skills-grid">
-      
-      {sortedSkills.map(category => (
-        <div class="skill-category">
-          <h3 class="category-title">{category.data.title}</h3>
-          <div class="skill-tags">
-            {category.data.skills.map(skill => (
-              <span class="tag">{skill}</span>
-            ))}
+      {
+        sortedSkills.map((category) => (
+          <div class="skill-category">
+            <h3 class="category-title">{category.data.title}</h3>
+            <div class="skill-tags">
+              {category.data.skills.map((skill) => (
+                <span class="tag">{skill}</span>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
-
+        ))
+      }
     </div>
   </section>
 
@@ -137,17 +159,24 @@ const allArticles = [
   <section id="open-source" class="section">
     <h2 class="section-title">Open Source</h2>
     <div class="os-grid">
-      
-      {sortedOpenSource.map(project => (
-        <a href={project.data.link} target="_blank" rel="noopener noreferrer" class="os-card">
-          <div class="os-header">
-            <h3 class="os-title">{project.data.title}</h3>
-            <span class={`os-role ${project.data.role.toLowerCase()}`}>{project.data.role}</span>
-          </div>
-          <p class="os-desc">{project.data.description}</p>
-        </a>
-      ))}
-
+      {
+        sortedOpenSource.map((project) => (
+          <a
+            href={project.data.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="os-card"
+          >
+            <div class="os-header">
+              <h3 class="os-title">{project.data.title}</h3>
+              <span class={`os-role ${project.data.role.toLowerCase()}`}>
+                {project.data.role}
+              </span>
+            </div>
+            <p class="os-desc">{project.data.description}</p>
+          </a>
+        ))
+      }
     </div>
   </section>
 
@@ -155,24 +184,32 @@ const allArticles = [
   <section id="projects" class="section">
     <h2 class="section-title">Featured Projects</h2>
     <div class="projects-grid">
-      {sortedProjects.length > 0 ? sortedProjects.map(project => (
-        <a href={`/projects/${project.slug}`} class="project-card">
-          {project.data.coverImage && (
-            <img src={project.data.coverImage} alt={project.data.title} class="project-image" />
-          )}
-          <div class="project-info">
-            <h3 class="project-title">{project.data.title}</h3>
-            <p class="project-desc">{project.data.description}</p>
-            <div class="project-tags">
-              {project.data.tags.map(tag => (
-                <span class="tag">{tag}</span>
-              ))}
-            </div>
-          </div>
-        </a>
-      )) : (
-        <p>No projects found. Check back soon!</p>
-      )}
+      {
+        sortedProjects.length > 0 ? (
+          sortedProjects.map((project) => (
+            <a href={`/projects/${project.slug}`} class="project-card">
+              {project.data.coverImage && (
+                <img
+                  src={project.data.coverImage}
+                  alt={project.data.title}
+                  class="project-image"
+                />
+              )}
+              <div class="project-info">
+                <h3 class="project-title">{project.data.title}</h3>
+                <p class="project-desc">{project.data.description}</p>
+                <div class="project-tags">
+                  {project.data.tags.map((tag) => (
+                    <span class="tag">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </a>
+          ))
+        ) : (
+          <p>No projects found. Check back soon!</p>
+        )
+      }
     </div>
   </section>
 
@@ -180,30 +217,43 @@ const allArticles = [
   <section id="articles" class="section">
     <h2 class="section-title">Latest Articles</h2>
     <p class="section-subtitle">Thoughts, opinions, and technical tutorials.</p>
-    
+
     <div class="carousel-container">
       <div class="carousel-track" id="articles-carousel">
-        {allArticles.map(article => (
-          <div class="carousel-item">
-            <a href={article.link} target="_blank" rel="noopener noreferrer" class="article-card-mini">
-              <div class="article-meta-mini">
-                <span class="source-tag-mini">{article.source}</span>
-                <span class="read-time-mini">{article.readingTime}</span>
-              </div>
-              <h3 class="article-title-mini">{article.title}</h3>
-              <time class="article-date-mini">
-                {article.date.toLocaleDateString('en-US', {
-                  month: 'short', day: 'numeric', year: 'numeric'
-                })}
-              </time>
-            </a>
-          </div>
-        ))}
+        {
+          allArticles.map((article) => (
+            <div class="carousel-item">
+              <a
+                href={article.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="article-card-mini"
+              >
+                <div class="article-meta-mini">
+                  <span class="source-tag-mini">{article.source}</span>
+                  <span class="read-time-mini">{article.readingTime}</span>
+                </div>
+                <h3 class="article-title-mini">{article.title}</h3>
+                <time class="article-date-mini">
+                  {article.date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </time>
+              </a>
+            </div>
+          ))
+        }
       </div>
-      
+
       <div class="carousel-controls">
-        <button class="carousel-btn prev" aria-label="Previous articles">&larr;</button>
-        <button class="carousel-btn next" aria-label="Next articles">&rarr;</button>
+        <button class="carousel-btn prev" aria-label="Previous articles"
+          >&larr;</button
+        >
+        <button class="carousel-btn next" aria-label="Next articles"
+          >&rarr;</button
+        >
       </div>
     </div>
   </section>
@@ -211,34 +261,68 @@ const allArticles = [
   <!-- Contact Section -->
   <section id="contact" class="section contact">
     <h2 class="section-title">Get in Touch</h2>
-    <p>Feel free to reach out if you want to collaborate, ask a question, or simply say hello!</p>
+    <p>
+      Feel free to reach out if you want to collaborate, ask a question, or
+      simply say hello!
+    </p>
     <div class="contact-methods">
       <a href="mailto:talk@sagardash.me" class="contact-method-link">
         <span class="method-icon">📩</span> talk@sagardash.me
       </a>
-      <a href="https://t.me/sagardashme" target="_blank" rel="noopener noreferrer" class="contact-method-link">
+      <a
+        href="https://t.me/sagardashme"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="contact-method-link"
+      >
         <span class="method-icon">✈️</span> Telegram
       </a>
-      <a href="http://m.me/sagar.dash1" target="_blank" rel="noopener noreferrer" class="contact-method-link">
+      <a
+        href="http://m.me/sagar.dash1"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="contact-method-link"
+      >
         <span class="method-icon">💬</span> Messenger
       </a>
     </div>
-    
+
     <!-- Formspree Form -->
-    <form class="contact-form" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+    <form
+      class="contact-form"
+      action="https://formspree.io/f/YOUR_FORMSPREE_ID"
+      method="POST"
+    >
       <div class="form-group">
         <label for="name">Name</label>
-        <input type="text" id="name" name="name" required placeholder="Your Name" />
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          placeholder="Your Name"
+        />
       </div>
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" required placeholder="your.email@example.com" />
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          placeholder="your.email@example.com"
+        />
       </div>
       <div class="form-group">
         <label for="message">Message</label>
-        <textarea id="message" name="message" rows="5" required placeholder="What's on your mind?"></textarea>
+        <textarea
+          id="message"
+          name="message"
+          rows="5"
+          required
+          placeholder="What's on your mind?"></textarea>
       </div>
-      <button type="submit" class="btn btn-primary">Send Message</button>
+      <MagicButton type="submit">Send Message</MagicButton>
     </form>
   </section>
 </BaseLayout>
@@ -286,7 +370,12 @@ const allArticles = [
     height: 300px;
     border-radius: 50%;
     padding: 6px; /* Width of the gradient frame */
-    background: linear-gradient(135deg, var(--brand-color), #8b5cf6, var(--brand-color));
+    background: linear-gradient(
+      135deg,
+      var(--brand-color),
+      #8b5cf6,
+      var(--brand-color)
+    );
     background-size: 200% 200%;
     animation: gradientMove 5s ease infinite;
     box-shadow: 0 20px 50px rgba(var(--brand-rgb), 0.3);
@@ -314,9 +403,15 @@ const allArticles = [
   }
 
   @keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
 
   /* Section Titles */
@@ -327,7 +422,7 @@ const allArticles = [
     display: inline-block;
   }
   .section-title::after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: -0.5rem;
     left: 0;
@@ -356,7 +451,7 @@ const allArticles = [
     padding-left: 2rem;
   }
   .experience-list::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 8px; /* Centers the 2px line based on the dot size */
@@ -364,7 +459,7 @@ const allArticles = [
     width: 2px;
     background: var(--border-color);
   }
-  
+
   .experience-item {
     position: relative;
     padding-bottom: 3rem;
@@ -373,7 +468,7 @@ const allArticles = [
     padding-bottom: 0;
   }
   .experience-item::before {
-    content: '';
+    content: "";
     position: absolute;
     left: -2rem; /* Exact offset needed relative to padding-left */
     top: 0.25rem;
@@ -385,7 +480,7 @@ const allArticles = [
     z-index: 10;
     box-shadow: 0 0 0 4px var(--bg-color); /* Cut out background effectively */
   }
-  
+
   .experience-header {
     display: flex;
     justify-content: space-between;
@@ -435,7 +530,7 @@ const allArticles = [
     position: relative;
   }
   :global(.experience-highlights li::before) {
-    content: '→';
+    content: "→";
     position: absolute;
     left: -1.25rem;
     color: var(--brand-color);
@@ -473,7 +568,7 @@ const allArticles = [
     gap: 0.75rem;
   }
   .category-title::before {
-    content: '';
+    content: "";
     display: block;
     width: 8px;
     height: 8px;
@@ -631,7 +726,7 @@ const allArticles = [
     padding: 1rem 0;
     overflow-x: auto;
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE and Edge */
+    -ms-overflow-style: none; /* IE and Edge */
   }
 
   .carousel-track::-webkit-scrollbar {
@@ -671,7 +766,7 @@ const allArticles = [
   .article-card-mini:hover {
     transform: translateY(-5px);
     border-color: var(--brand-color);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   }
 
   .article-meta-mini {
@@ -818,7 +913,7 @@ const allArticles = [
     padding: 1rem 0;
     overflow-x: auto;
     scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none;  /* IE and Edge */
+    -ms-overflow-style: none; /* IE and Edge */
   }
 
   .carousel-track::-webkit-scrollbar {
@@ -858,7 +953,7 @@ const allArticles = [
   .article-card-mini:hover {
     transform: translateY(-5px);
     border-color: var(--brand-color);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   }
 
   .article-meta-mini {
@@ -929,39 +1024,45 @@ const allArticles = [
 
 <script>
   // Carousel Navigation Logic
-  const track = document.getElementById('articles-carousel') as HTMLElement;
-  const prevBtn = document.querySelector('.carousel-btn.prev') as HTMLButtonElement;
-  const nextBtn = document.querySelector('.carousel-btn.next') as HTMLButtonElement;
+  const track = document.getElementById("articles-carousel") as HTMLElement;
+  const prevBtn = document.querySelector(
+    ".carousel-btn.prev"
+  ) as HTMLButtonElement;
+  const nextBtn = document.querySelector(
+    ".carousel-btn.next"
+  ) as HTMLButtonElement;
 
   if (track && prevBtn && nextBtn) {
     const getScrollAmount = () => {
-      const itemWidth = track.querySelector('.carousel-item')?.getBoundingClientRect().width || 0;
+      const itemWidth =
+        track.querySelector(".carousel-item")?.getBoundingClientRect().width ||
+        0;
       const gap = 24; // 1.5rem
       return itemWidth + gap;
     };
 
-    nextBtn.addEventListener('click', () => {
-      track.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+    nextBtn.addEventListener("click", () => {
+      track.scrollBy({ left: getScrollAmount(), behavior: "smooth" });
     });
 
-    prevBtn.addEventListener('click', () => {
-      track.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+    prevBtn.addEventListener("click", () => {
+      track.scrollBy({ left: -getScrollAmount(), behavior: "smooth" });
     });
 
     // Optional: Hide arrows if at start/end
-    track.addEventListener('scroll', () => {
+    track.addEventListener("scroll", () => {
       const maxScroll = track.scrollWidth - track.clientWidth;
-      prevBtn.style.opacity = track.scrollLeft <= 5 ? '0.3' : '1';
-      prevBtn.style.pointerEvents = track.scrollLeft <= 5 ? 'none' : 'auto';
-      
-      nextBtn.style.opacity = track.scrollLeft >= maxScroll - 5 ? '0.3' : '1';
-      nextBtn.style.pointerEvents = track.scrollLeft >= maxScroll - 5 ? 'none' : 'auto';
+      prevBtn.style.opacity = track.scrollLeft <= 5 ? "0.3" : "1";
+      prevBtn.style.pointerEvents = track.scrollLeft <= 5 ? "none" : "auto";
+
+      nextBtn.style.opacity = track.scrollLeft >= maxScroll - 5 ? "0.3" : "1";
+      nextBtn.style.pointerEvents =
+        track.scrollLeft >= maxScroll - 5 ? "none" : "auto";
     });
-    
+
     // Initial state
     setTimeout(() => {
-        track.dispatchEvent(new Event('scroll'));
+      track.dispatchEvent(new Event("scroll"));
     }, 100);
   }
 </script>
-

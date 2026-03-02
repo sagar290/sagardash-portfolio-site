@@ -1,0 +1,88 @@
+---
+const {
+  className = "",
+  icon,
+  position = "right",
+  href,
+  target,
+  rel,
+} = Astro.props;
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      target={target}
+      rel={rel}
+      class={
+        className +
+        " magic-button-link group relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-slate-900"
+      }
+    >
+      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+      <span class="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-1 text-sm font-medium text-white backdrop-blur-3xl group-hover:bg-slate-900 transition-all duration-300">
+        {position === "left" && icon && <span class="mr-2">{icon}</span>}
+        <slot />
+        {position === "right" && icon && <span class="ml-2">{icon}</span>}
+      </span>
+    </a>
+  ) : (
+    <button
+      class={
+        className +
+        " magic-button group relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-slate-900"
+      }
+    >
+      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
+      <span class="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-1 text-sm font-medium text-white backdrop-blur-3xl group-hover:bg-slate-900 transition-all duration-300">
+        {position === "left" && icon && <span class="mr-2">{icon}</span>}
+        <slot />
+        {position === "right" && icon && <span class="ml-2">{icon}</span>}
+      </span>
+    </button>
+  )
+}
+
+<style>
+  .magic-button,
+  .magic-button-link {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+  }
+
+  .magic-button:hover,
+  .magic-button-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 112, 243, 0.3);
+  }
+
+  .magic-button:active,
+  .magic-button-link:active {
+    transform: translateY(0);
+  }
+
+  .magic-button span:last-child:hover,
+  .magic-button-link span:last-child:hover {
+    background: rgba(15, 23, 42, 0.9);
+  }
+
+  :global(.dark) .magic-button span:last-child,
+  :global(.dark) .magic-button-link span:last-child {
+    background: #0f172a; /* Same as slate-900 or use var(--bg-color) */
+  }
+
+  :global(.dark) .magic-button span:last-child:hover,
+  :global(.dark) .magic-button-link span:last-child:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>
