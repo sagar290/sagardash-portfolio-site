@@ -1,13 +1,13 @@
 ---
-import ThemeToggle from './ThemeToggle.astro';
+import ThemeToggle from "./ThemeToggle.astro";
 
 const navLinks = [
-  { href: '/#about', label: 'About' },
-  { href: '/#experience', label: 'Experience' },
-  { href: '/#skills', label: 'Skills' },
-  { href: '/#open-source', label: 'OS' },
-  { href: '/#projects', label: 'Projects' },
-  { href: '/#articles', label: 'Articles' },
+  { href: "/#about", label: "About" },
+  { href: "/#experience", label: "Experience" },
+  { href: "/#skills", label: "Skills" },
+  { href: "/#open-source", label: "OS" },
+  { href: "/#projects", label: "Projects" },
+  { href: "/#articles", label: "Articles" },
 ];
 ---
 
@@ -32,16 +32,18 @@ const navLinks = [
   <div id="mobile-menu" class="mobile-menu">
     <nav class="mobile-nav">
       <ul class="mobile-links">
-        {navLinks.map((link) => (
-          <li>
-            <a href={link.href} class="mobile-link">
-              {link.label}
-            </a>
-          </li>
-        ))}
+        {
+          navLinks.map((link) => (
+            <li>
+              <a href={link.href} class="mobile-link">
+                {link.label}
+              </a>
+            </li>
+          ))
+        }
         <li class="mobile-theme-item">
-            <span class="theme-label">Theme Mode</span>
-            <ThemeToggle />
+          <span class="theme-label">Theme Mode</span>
+          <ThemeToggle />
         </li>
         <li>
           <a href="/#contact" class="mobile-contact-btn">Contact Me</a>
@@ -101,7 +103,12 @@ const navLinks = [
     font-size: 1.5rem;
     font-weight: 900;
     letter-spacing: -0.04em;
-    background: linear-gradient(135deg, var(--brand-color), #8b5cf6, var(--brand-color));
+    background: linear-gradient(
+      135deg,
+      var(--brand-color),
+      #8b5cf6,
+      var(--brand-color)
+    );
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -109,7 +116,9 @@ const navLinks = [
   }
 
   @keyframes shine {
-      to { background-position: 200% center; }
+    to {
+      background-position: 200% center;
+    }
   }
 
   .header-actions {
@@ -145,12 +154,13 @@ const navLinks = [
     z-index: 1001;
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1200px) {
     .menu-toggle {
-        display: block;
+      display: block;
     }
-    .header-actions .contact-btn, .header-actions :global(.theme-toggle) {
-        display: none;
+    .header-actions .contact-btn,
+    .header-actions :global(.theme-toggle) {
+      display: none;
     }
     /* Keep theme toggle visible if you want, but user said move to menu usually */
   }
@@ -166,7 +176,7 @@ const navLinks = [
 
   .hamburger::before,
   .hamburger::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 24px;
     height: 2px;
@@ -174,12 +184,24 @@ const navLinks = [
     transition: all 0.3s ease;
   }
 
-  .hamburger::before { top: -8px; }
-  .hamburger::after { bottom: -8px; }
+  .hamburger::before {
+    top: -8px;
+  }
+  .hamburger::after {
+    bottom: -8px;
+  }
 
-  .menu-open .hamburger { background: transparent; }
-  .menu-open .hamburger::before { transform: rotate(45deg); top: 0; }
-  .menu-open .hamburger::after { transform: rotate(-45deg); bottom: 0; }
+  .menu-open .hamburger {
+    background: transparent;
+  }
+  .menu-open .hamburger::before {
+    transform: rotate(45deg);
+    top: 0;
+  }
+  .menu-open .hamburger::after {
+    transform: rotate(-45deg);
+    bottom: 0;
+  }
 
   .mobile-menu {
     position: fixed;
@@ -226,17 +248,17 @@ const navLinks = [
   }
 
   .mobile-theme-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border-color);
-      margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 1rem;
   }
 
   .theme-label {
-      font-weight: 600;
-      opacity: 0.6;
+    font-weight: 600;
+    opacity: 0.6;
   }
 
   .mobile-link:hover {
@@ -257,31 +279,37 @@ const navLinks = [
 </style>
 
 <script>
-  const toggleBtn = document.getElementById('menu-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
+  const toggleBtn = document.getElementById("menu-toggle");
+  const mobileMenu = document.getElementById("mobile-menu");
   const body = document.body;
-  const mobileLinks = document.querySelectorAll('.mobile-link, .mobile-contact-btn');
+  const mobileLinks = document.querySelectorAll(
+    ".mobile-link, .mobile-contact-btn"
+  );
 
   function toggleMenu() {
-    mobileMenu?.classList.toggle('open');
-    toggleBtn?.classList.toggle('menu-open');
-    body.style.overflow = mobileMenu?.classList.contains('open') ? 'hidden' : '';
+    mobileMenu?.classList.toggle("open");
+    toggleBtn?.classList.toggle("menu-open");
+    body.style.overflow = mobileMenu?.classList.contains("open")
+      ? "hidden"
+      : "";
   }
 
-  toggleBtn?.addEventListener('click', toggleMenu);
+  toggleBtn?.addEventListener("click", toggleMenu);
 
-  mobileLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      if (mobileMenu?.classList.contains('open')) {
+  mobileLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (mobileMenu?.classList.contains("open")) {
         toggleMenu();
       }
     });
   });
 
-  window.addEventListener('click', (e) => {
-    if (mobileMenu?.classList.contains('open') && 
-        !mobileMenu.contains(e.target as Node) && 
-        !toggleBtn?.contains(e.target as Node)) {
+  window.addEventListener("click", (e) => {
+    if (
+      mobileMenu?.classList.contains("open") &&
+      !mobileMenu.contains(e.target as Node) &&
+      !toggleBtn?.contains(e.target as Node)
+    ) {
       toggleMenu();
     }
   });
