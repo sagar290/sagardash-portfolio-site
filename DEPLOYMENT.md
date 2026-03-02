@@ -112,6 +112,60 @@ After a few minutes, your site will be live at:
 
 - **User pages**: `https://username.github.io`
 - **Project pages**: `https://username.github.io/repo-name`
+- **Custom domain**: `https://sagardash.me` (your site is configured for this)
+
+## 🌐 Custom Domain Setup
+
+Your portfolio is already configured for the custom domain `sagardash.me`:
+
+### Files Already Set Up
+
+**`public/CNAME`:**
+```
+sagardash.me
+```
+
+**`astro.config.mjs`:**
+```javascript
+export default defineConfig({
+    site: 'https://sagardash.me',
+    integrations: [tailwind()],
+});
+```
+
+### DNS Configuration Required
+
+1. Go to your domain registrar (where you bought `sagardash.me`)
+2. Navigate to DNS settings
+3. Add a DNS record:
+
+**For root domain (`sagardash.me`):**
+- **Type**: A
+- **Name**: `@` or leave blank
+- **Value**: `185.199.108.153`
+- **TTL**: Default or 3600
+
+   **OR** (CNAME method if preferred):
+   - **Type**: CNAME
+   - **Name**: `@` or leave blank
+   - **Value**: `username.github.io` (replace with your GitHub username)
+
+**Note:** GitHub Pages provides 4 IP addresses for A records. You can add all four for redundancy:
+- `185.199.108.153`
+- `185.199.109.153`
+- `185.199.110.153`
+- `185.199.111.153`
+
+### Verify on GitHub Pages
+
+1. Go to repository **Settings** > **Pages**
+2. Under **Custom domain**, you should see `sagardash.me`
+3. Wait for DNS status to show "✅ DNS check successful"
+4. Enable "Enforce HTTPS" when available
+
+### SSL Certificate
+
+GitHub Pages automatically provisions an SSL certificate for your custom domain. This may take a few minutes to a few hours.
 
 ## 🔄 Making Updates
 

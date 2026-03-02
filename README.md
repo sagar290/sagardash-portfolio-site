@@ -106,6 +106,24 @@ npm run dev
 http://localhost:4321
 ```
 
+### 🌐 Custom Domain
+
+This portfolio is configured to deploy to `https://sagardash.me`
+
+**Files set up:**
+- `public/CNAME` - Points to `sagardash.me`
+- `astro.config.mjs` - Site URL configured
+- `src/layouts/BaseLayout.astro` - Schema updated for custom domain
+
+**DNS Configuration Required:**
+1. Go to your domain registrar
+2. Add an A record pointing to GitHub Pages IP:
+   - **Type**: A
+   - **Name**: `@` or blank
+   - **Value**: `185.199.108.153` (or any GitHub Pages IP)
+3. Wait for DNS propagation (up to 48 hours)
+4. Verify at [sagardash.me](https://sagardash.me)
+
 ## 📝 Content Management
 
 ### Adding a New Project

@@ -4,6 +4,14 @@ Follow these steps to deploy your portfolio to GitHub Pages in under 5 minutes!
 
 ## Step 1: Configure Astro (2 minutes)
 
+Your site is **already configured** for custom domain `sagardash.me`!
+
+**Files already set up:**
+- `public/CNAME` → Contains `sagardash.me`
+- `astro.config.mjs` → Site URL set to `https://sagardash.me`
+
+**If you want to use GitHub Pages URL instead:**
+
 Edit `astro.config.mjs` and update these values:
 
 ```javascript
@@ -21,16 +29,25 @@ export default defineConfig({
 
 **Two deployment options:**
 
-### Option A: User Pages (username.github.io)
+### Option A: Custom Domain (Recommended)
+- Repository: Any name (e.g., `portfolio`)
+- Set `site`: `https://yourdomain.com`
+- Remove `base` line
+- Keep `public/CNAME` file
+- URL: `https://yourdomain.com`
+
+### Option B: User Pages (username.github.io)
 - Repository: `username.github.io`
 - Set `site`: `https://username.github.io`
 - Remove `base` line
+- Remove `public/CNAME` file
 - URL: `https://username.github.io`
 
-### Option B: Project Pages (username.github.io/portfolio)
+### Option C: Project Pages (username.github.io/portfolio)
 - Repository: Any name (e.g., `portfolio`)
 - Set `site`: `https://username.github.io/portfolio`
 - Keep `base: '/portfolio'`
+- Remove `public/CNAME` file
 - URL: `https://username.github.io/portfolio`
 
 ## Step 2: Create GitHub Repository (1 minute)

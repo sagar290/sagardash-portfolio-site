@@ -4,14 +4,10 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-    // For GitHub Pages deployment:
-    // If your repo is username.github.io, use: https://username.github.io
-    // If your repo is username.github.io/portfolio, use: https://username.github.io/portfolio
-    site: 'https://sagar290.github.io/sagardash-portfolio-site',
+    // Your custom domain
+    site: 'https://sagardash.me',
     
-    // Set base to '/repo-name' if deploying to a repository other than username.github.io
-    // Remove this line if deploying to username.github.io
-    base: '/sagardash-portfolio-site',
-    
+    // Remove 'base' when using a custom domain
+    // Only use 'base' for subdirectory deployments like github.io/portfolio
     integrations: [tailwind()],
 });
