@@ -11,14 +11,13 @@ interface Props {
   image?: string;
 }
 
-const BASE_URL = import.meta.env.BASE_URL || "";
 const {
   title,
   description = "Minimalist Developer Portfolio",
-  image = `${BASE_URL}/og-image.png`,
+  image = "/og-image.png",
 } = Astro.props;
 
-const faviconUrl = `${BASE_URL}/avatar.png`;
+const faviconUrl = "/avatar.png";
 ---
 
 <!DOCTYPE html>
