@@ -302,7 +302,19 @@ npm run preview
 
 ## 📦 Deployment
 
-This site can be deployed to any static hosting service:
+This site can be deployed to any static hosting service.
+
+### 🚀 GitHub Pages (Recommended)
+
+Automated deployment is set up with GitHub Actions!
+
+**Quick Deploy Steps:**
+1. Configure `astro.config.mjs` with your GitHub URL
+2. Create a GitHub repository and push your code
+3. Enable GitHub Pages in repository settings
+4. Done! Deployments happen automatically on push
+
+**Full Guide:** See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
 ### Vercel
 
@@ -317,12 +329,6 @@ vercel
 npm install -g netlify-cli
 netlify deploy --prod
 ```
-
-### GitHub Pages
-
-1. Build the site: `npm run build`
-2. Push the `dist` folder to a GitHub repository
-3. Enable GitHub Pages in repository settings
 
 ### Cloudflare Pages
 
