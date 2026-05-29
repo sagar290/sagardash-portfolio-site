@@ -7,6 +7,7 @@ import Sparkles from "../components/ui/Sparkles.astro";
 import MovingBorder from "../components/ui/MovingBorder.astro";
 import HeroHighlight from "../components/ui/HeroHighlight.astro";
 import MagicButton from "../components/ui/MagicButton.astro";
+import { HOME_SEO, createProfilePageSchema } from "../lib/seo";
 
 const allProjects = await getCollection("projects");
 const sortedProjects = allProjects.sort(
@@ -66,9 +67,19 @@ const allArticles = [
   })),
   ...mediumArticles,
 ].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+const homeStructuredData = createProfilePageSchema(
+  HOME_SEO.title,
+  HOME_SEO.description
+);
 ---
 
-<BaseLayout title="Sagar Dash | Backend Architect">
+<BaseLayout
+  title={HOME_SEO.title}
+  description={HOME_SEO.description}
+  keywords={HOME_SEO.keywords}
+  structuredData={homeStructuredData}
+>
   <!-- Hero Section -->
   <HeroHighlight>
     <div class="container relative z-10 pt-8 md:pt-0">
@@ -253,6 +264,29 @@ const allArticles = [
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Profile Search Signals -->
+  <section id="profile" class="section profile-search">
+    <h2 class="section-title">Sagar Dash Profile</h2>
+    <div class="profile-search-grid">
+      <div>
+        <h3>Go Backend Engineer</h3>
+        <p>
+          Sagar Dash is a Go backend engineer and backend architect focused on
+          Golang services, distributed systems, microservices, API architecture,
+          Kubernetes, Redis, RabbitMQ, and high-availability cloud systems.
+        </p>
+      </div>
+      <div>
+        <h3>Name Variants</h3>
+        <p>
+          This portfolio represents Sagar Dash. People may also search for
+          similar spellings such as Sagor Dash, Sagar Das, Sager Dash, Sagar
+          Dhash, Sagar Dhas, or Sagar290.
+        </p>
       </div>
     </div>
   </section>
@@ -868,6 +902,37 @@ const allArticles = [
   }
   :global(.about-content li) {
     margin-bottom: 0.5rem;
+  }
+
+  /* Profile Search Signals */
+  .profile-search {
+    padding-top: 1rem;
+  }
+
+  .profile-search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .profile-search-grid > div {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .profile-search-grid h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .profile-search-grid p {
+    font-size: 0.98rem;
+    line-height: 1.7;
+    opacity: 0.82;
+    margin: 0;
   }
 
   /* Experience Timeline */

@@ -4,22 +4,34 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import SidebarTimeline from "../components/SidebarTimeline.astro";
 import { ClientRouter } from "astro:transitions";
+import {
+  DEFAULT_SEO,
+  PERSON_NAME,
+  SITE_NAME,
+  SITE_URL,
+  assetUrl,
+  createDefaultStructuredData,
+} from "../lib/seo";
 
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
   image?: string;
+  keywords?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const baseUrl = "https://sagardash.me";
-
 const {
-  title = "Sagar Dash - Backend Architect",
-  description = "APIs | Microservices | Distributed Systems | Cloud Architecture | Sagar Dash",
-  image = baseUrl + "/og-image.png",
+  title = DEFAULT_SEO.title,
+  description = DEFAULT_SEO.description,
+  image = DEFAULT_SEO.image,
+  keywords = DEFAULT_SEO.keywords,
+  structuredData,
 } = Astro.props;
 
-const faviconUrl = baseUrl + "/avatar.png";
+const faviconUrl = assetUrl("/avatar.png");
+const canonicalUrl = new URL(Astro.url.pathname, SITE_URL).toString();
+const pageStructuredData = structuredData ?? createDefaultStructuredData();
 ---
 
 <!DOCTYPE html>
@@ -28,12 +40,12 @@ const faviconUrl = baseUrl + "/avatar.png";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href={faviconUrl} />
-    <link rel="icon" type="image/png" href={baseUrl + "/favicon-96x96.png"} sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href={baseUrl + "/favicon.svg"} />
-    <link rel="shortcut icon" href={baseUrl + "/favicon.ico"} />
-    <link rel="apple-touch-icon" sizes="180x180" href={baseUrl + "/apple-touch-icon.png"} />
-    <meta name="apple-mobile-web-app-title" content="Sagar Dash Portfolio" />
-    <link rel="manifest" href={baseUrl + "/site.webmanifest"} />
+    <link rel="icon" type="image/png" href={assetUrl("/favicon-96x96.png")} sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href={assetUrl("/favicon.svg")} />
+    <link rel="shortcut icon" href={assetUrl("/favicon.ico")} />
+    <link rel="apple-touch-icon" sizes="180x180" href={assetUrl("/apple-touch-icon.png")} />
+    <meta name="apple-mobile-web-app-title" content={SITE_NAME} />
+    <link rel="manifest" href={assetUrl("/site.webmanifest")} />
     <meta name="generator" content={Astro.generator} />
 
 
@@ -139,14 +151,17 @@ const faviconUrl = baseUrl + "/avatar.png";
     <!-- SEO / OpenGraph Tags -->
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="author" content={PERSON_NAME} />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href={Astro.url.href} />
+    <link rel="canonical" href={canonicalUrl} />
     
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={image} />
-    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:url" content={canonicalUrl} />
     
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
@@ -154,21 +169,7 @@ const faviconUrl = baseUrl + "/avatar.png";
     <meta name="twitter:image" content={image} />
 
     <!-- JSON-LD Structured Data -->
-    <script type="application/ld+json" is:inline>
-      {
-        "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Sagar Dash",
-        "url": "https://sagardash.me",
-        "sameAs": [
-          "https://github.com/sagar290",
-          "https://www.linkedin.com/in/sagardash1/",
-          "https://medium.com/@sagar-dash290"
-        ],
-        "jobTitle": "Backend Architect",
-        "description": "Backend Architect with 8+ years of experience designing and scaling distributed systems."
-      }
-    </script>
+    <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
 
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
