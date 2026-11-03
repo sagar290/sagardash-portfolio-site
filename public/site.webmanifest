@@ -1,6 +1,7 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "Sagar Dash",
+  "short_name": "Sagar Dash",
+  "description": "Portfolio of Sagar Dash — Go backend architect and distributed systems engineer.",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -15,7 +16,9 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#f05000",
+  "theme_color": "#e34a00",
   "background_color": "#070e1a",
-  "display": "standalone"
+  "display": "standalone",
+  "start_url": "/",
+  "lang": "en"
 }

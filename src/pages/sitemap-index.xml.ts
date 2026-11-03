@@ -1,38 +1,51 @@
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
 
-const SITE = 'https://sagardash.me';
+const SITE = "https://sagardash.me";
 
 function escapeXml(value: string) {
   return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
 function toIsoDate(date: Date) {
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 }
 
 export async function GET() {
-  const projects = await getCollection('projects');
+  const projects = await getCollection("projects");
+  const articles = await getCollection("articles").catch(() => []);
+
   const sortedProjects = projects.sort(
     (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
   );
+  const sortedArticles = articles.sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  );
+
+  const latestProjectDate = sortedProjects[0]?.data.date ?? new Date();
 
   const urls = [
     {
-      loc: '/',
-      lastmod: toIsoDate(new Date()),
-      changefreq: 'monthly',
-      priority: '1.0',
+      loc: "/",
+      lastmod: toIsoDate(latestProjectDate),
+      changefreq: "monthly",
+      priority: "1.0",
     },
     ...sortedProjects.map((entry) => ({
       loc: `/projects/${entry.slug}/`,
       lastmod: toIsoDate(entry.data.date),
-      changefreq: 'monthly',
-      priority: '0.8',
+      changefreq: "monthly",
+      priority: "0.8",
+    })),
+    ...sortedArticles.map((entry) => ({
+      loc: `/articles/${entry.slug}/`,
+      lastmod: toIsoDate(entry.data.date),
+      changefreq: "monthly",
+      priority: "0.7",
     })),
   ];
 
@@ -47,13 +60,13 @@ ${urls
     <priority>${url.priority}</priority>
   </url>`
   )
-  .join('\n')}
+  .join("\n")}
 </urlset>
 `;
 
   return new Response(body, {
     headers: {
-      'Content-Type': 'application/xml; charset=utf-8',
+      "Content-Type": "application/xml; charset=utf-8",
     },
   });
 }

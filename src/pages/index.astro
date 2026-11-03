@@ -6,6 +6,7 @@ import Parser from "rss-parser";
 import Sparkles from "../components/ui/Sparkles.astro";
 import HeroHighlight from "../components/ui/HeroHighlight.astro";
 import MagicButton from "../components/ui/MagicButton.astro";
+import ImpactStats from "../components/ImpactStats.astro";
 import { HOME_SEO, createProfilePageSchema } from "../lib/seo";
 
 const allProjects = await getCollection("projects");
@@ -88,7 +89,9 @@ const homeStructuredData = createProfilePageSchema(
         <div class="hero-content hero-stagger flex-1 text-left">
           <h1 class="hero-title leading-tight">
             <span class="highlight text-highlight">Sagar Dash</span><br />
-            Backend Architect
+            <span class="role-cycle" aria-live="polite">
+              <span class="role-cycle-text">Backend Architect</span>
+            </span>
           </h1>
           <p class="hero-tagline max-w-xl">
             8+ years scaling APIs, microservices, and distributed systems in the
@@ -225,6 +228,8 @@ const homeStructuredData = createProfilePageSchema(
       </div>
     </div>
   </HeroHighlight>
+
+  <ImpactStats />
 
   <!-- About Section -->
   <section id="about" class="section">
@@ -487,6 +492,22 @@ const homeStructuredData = createProfilePageSchema(
   }
   .highlight {
     color: var(--brand-color);
+  }
+  .role-cycle {
+    display: inline-block;
+    min-height: 1.15em;
+  }
+  .role-cycle-text {
+    display: inline-block;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .role-cycle-text.is-leaving {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  .role-cycle-text.is-entering {
+    opacity: 0;
+    transform: translateY(8px);
   }
   .hero-tagline {
     font-size: 1.25rem;
@@ -1273,9 +1294,43 @@ const homeStructuredData = createProfilePageSchema(
     targets.forEach((el) => observer.observe(el));
   }
 
+  function setupRoleCycle() {
+    const el = document.querySelector(".role-cycle-text") as HTMLElement | null;
+    if (!el || el.dataset.ready === "1") return;
+    el.dataset.ready = "1";
+
+    const roles = [
+      "Backend Architect",
+      "Distributed Systems",
+      "Go · Redis · Kubernetes",
+      "High-Availability APIs",
+    ];
+    let index = 0;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    const swap = () => {
+      el.classList.add("is-leaving");
+      window.setTimeout(() => {
+        index = (index + 1) % roles.length;
+        el.textContent = roles[index];
+        el.classList.remove("is-leaving");
+        el.classList.add("is-entering");
+        requestAnimationFrame(() => {
+          el.classList.remove("is-entering");
+        });
+      }, 280);
+    };
+
+    window.setInterval(swap, 2800);
+  }
+
   document.addEventListener("astro:page-load", () => {
     setupCarousel();
     setupContactForm();
     setupReveals();
+    setupRoleCycle();
   });
 </script>

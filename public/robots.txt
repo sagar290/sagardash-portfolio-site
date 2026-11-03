@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://sagardash.me/sitemap.xml
 Sitemap: https://sagardash.me/sitemap-index.xml

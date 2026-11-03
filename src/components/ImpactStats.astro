@@ -1,0 +1,167 @@
+---
+const stats = [
+  { value: 8, suffix: "+", label: "Years building systems" },
+  { value: 40, suffix: "%", label: "Latency cut on hot paths" },
+  { value: 1000, suffix: "+", label: "Concurrent live users" },
+  { value: 6, suffix: "", label: "Featured case studies" },
+];
+---
+
+<section class="impact-stats reveal" aria-label="Impact highlights">
+  <div class="impact-grid">
+    {
+      stats.map((stat) => (
+        <div class="impact-item">
+          <p class="impact-value">
+            <span
+              class="count-up"
+              data-target={stat.value}
+              data-suffix={stat.suffix}
+              >0{stat.suffix}</span
+            >
+          </p>
+          <p class="impact-label">{stat.label}</p>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .impact-stats {
+    margin: -1rem 0 1rem;
+    padding: 1.5rem 0;
+  }
+
+  .impact-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    background: var(--card-bg);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .impact-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      rgba(var(--brand-rgb), 0.08),
+      transparent 40%,
+      rgba(var(--brand-secondary-rgb), 0.06)
+    );
+    pointer-events: none;
+  }
+
+  .impact-item {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 0.35rem 0.25rem;
+  }
+
+  .impact-item:not(:last-child) {
+    border-right: 1px solid var(--border-color);
+  }
+
+  .impact-value {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw, 2.35rem);
+    font-weight: 800;
+    line-height: 1;
+    margin: 0 0 0.45rem;
+    color: var(--brand-color);
+    letter-spacing: -0.03em;
+  }
+
+  .impact-label {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--muted-color);
+    line-height: 1.35;
+  }
+
+  @media (max-width: 800px) {
+    .impact-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem 0.75rem;
+      padding: 1.25rem 1rem;
+    }
+
+    .impact-item:nth-child(2) {
+      border-right: none;
+    }
+
+    .impact-item:nth-child(1),
+    .impact-item:nth-child(2) {
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .impact-item:nth-child(3),
+    .impact-item:nth-child(4) {
+      border-right: none;
+    }
+
+    .impact-item:nth-child(3) {
+      border-right: 1px solid var(--border-color);
+    }
+  }
+</style>
+
+<script>
+  function setupCountUp() {
+    const prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+    const counters = document.querySelectorAll<HTMLElement>(".count-up");
+    if (!counters.length) return;
+
+    const animate = (el: HTMLElement) => {
+      const target = Number(el.dataset.target || 0);
+      const suffix = el.dataset.suffix || "";
+      if (prefersReduced) {
+        el.textContent = `${target}${suffix}`;
+        return;
+      }
+
+      const duration = 1100;
+      const start = performance.now();
+
+      const tick = (now: number) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(target * eased);
+        el.textContent = `${current}${suffix}`;
+        if (progress < 1) requestAnimationFrame(tick);
+      };
+
+      requestAnimationFrame(tick);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target as HTMLElement;
+          if (el.dataset.counted === "1") return;
+          el.dataset.counted = "1";
+          animate(el);
+          observer.unobserve(el);
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    counters.forEach((el) => observer.observe(el));
+  }
+
+  document.addEventListener("astro:page-load", setupCountUp);
+</script>

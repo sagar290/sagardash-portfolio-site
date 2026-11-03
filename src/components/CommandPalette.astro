@@ -1,0 +1,674 @@
+---
+---
+
+<div id="command-palette" class="cmdk" hidden>
+  <div class="cmdk-backdrop" data-cmdk-close></div>
+  <div
+    class="cmdk-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Command palette"
+  >
+    <div class="cmdk-input-wrap">
+      <svg
+        class="cmdk-search-icon"
+        xmlns="http://www.w3.org/2000/svg"
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+      </svg>
+      <input
+        id="cmdk-input"
+        class="cmdk-input"
+        type="text"
+        placeholder="Jump to a section, copy email, open links…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-autocomplete="list"
+        aria-controls="cmdk-list"
+      />
+      <kbd class="cmdk-esc">esc</kbd>
+    </div>
+    <div id="cmdk-list" class="cmdk-list" role="listbox"></div>
+    <div class="cmdk-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
+  </div>
+</div>
+
+<button
+  id="cmdk-trigger"
+  class="cmdk-trigger"
+  type="button"
+  aria-label="Open command palette"
+  title="Command palette"
+>
+  <span class="cmdk-trigger-label">Search</span>
+  <kbd class="cmdk-trigger-keys"><span data-cmdk-mod>⌘</span>K</kbd>
+</button>
+
+<style is:global>
+  .cmdk[hidden] {
+    display: none;
+  }
+
+  .cmdk {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 12vh 1rem 1rem;
+  }
+
+  .cmdk-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 14, 26, 0.62);
+    backdrop-filter: blur(8px);
+  }
+
+  .cmdk-panel {
+    position: relative;
+    width: min(560px, 100%);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: cmdkIn 0.18s ease;
+  }
+
+  @keyframes cmdkIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .cmdk-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.95rem 1.05rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .cmdk-search-icon {
+    flex-shrink: 0;
+    color: var(--muted-color);
+  }
+
+  .cmdk-input {
+    flex: 1;
+    border: none !important;
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 1rem;
+    color: var(--text-color);
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .cmdk-input::placeholder {
+    color: var(--muted-color);
+    opacity: 0.85;
+  }
+
+  .cmdk-esc {
+    font-size: 0.68rem;
+    font-family: inherit;
+    padding: 0.2rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--muted-color);
+  }
+
+  .cmdk-list {
+    margin: 0;
+    padding: 0.45rem;
+    max-height: min(420px, 58vh);
+    overflow-y: auto;
+  }
+
+  .cmdk-group + .cmdk-group {
+    margin-top: 0.35rem;
+  }
+
+  .cmdk-group-label {
+    padding: 0.55rem 0.85rem 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-color);
+  }
+
+  .cmdk-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-color);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+
+  .cmdk-item[aria-selected="true"],
+  .cmdk-item:hover {
+    background: rgba(var(--brand-rgb), 0.12);
+  }
+
+  .cmdk-item[aria-selected="true"] {
+    box-shadow: inset 3px 0 0 var(--brand-color);
+  }
+
+  .cmdk-item-icon {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: rgba(var(--brand-rgb), 0.1);
+    color: var(--brand-color);
+  }
+
+  .cmdk-item[aria-selected="true"] .cmdk-item-icon {
+    background: rgba(var(--brand-rgb), 0.18);
+  }
+
+  .cmdk-item-main {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.12rem;
+  }
+
+  .cmdk-item-title {
+    font-weight: 650;
+    font-size: 0.94rem;
+    line-height: 1.25;
+    color: var(--text-color);
+  }
+
+  .cmdk-item-hint {
+    font-size: 0.74rem;
+    line-height: 1.3;
+    color: var(--muted-color);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .cmdk-item-shortcut {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    color: var(--muted-color);
+    opacity: 0;
+  }
+
+  .cmdk-item[aria-selected="true"] .cmdk-item-shortcut {
+    opacity: 1;
+  }
+
+  .cmdk-empty {
+    padding: 1.75rem 1rem;
+    text-align: center;
+    color: var(--muted-color);
+    font-size: 0.9rem;
+  }
+
+  .cmdk-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    padding: 0.65rem 1rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.72rem;
+    color: var(--muted-color);
+  }
+
+  .cmdk-footer kbd {
+    display: inline-block;
+    min-width: 1.2rem;
+    padding: 0.1rem 0.3rem;
+    margin-right: 0.15rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    font-family: inherit;
+    font-size: 0.68rem;
+    text-align: center;
+  }
+
+  .cmdk-trigger {
+    position: fixed;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 900;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem 0.55rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    font: inherit;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cmdk-trigger:hover {
+    transform: translateY(-2px);
+    border-color: rgba(var(--brand-rgb), 0.45);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .cmdk-trigger-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  .cmdk-trigger-keys {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    font-size: 0.7rem;
+    font-family: inherit;
+    color: var(--muted-color);
+  }
+
+  @media (max-width: 640px) {
+    .cmdk {
+      padding-top: 12vh;
+    }
+
+    .cmdk-trigger-label {
+      display: none;
+    }
+
+    .cmdk-item-shortcut {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cmdk-panel {
+      animation: none;
+    }
+
+    .cmdk-trigger:hover {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  type CommandAction = {
+    id: string;
+    title: string;
+    hint: string;
+    group: "Navigate" | "Actions" | "Links";
+    keywords: string;
+    icon: string;
+    run: () => void | Promise<void>;
+  };
+
+  const ICONS = {
+    user: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    briefcase: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>`,
+    spark: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .962L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>`,
+    git: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>`,
+    folder: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`,
+    pen: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>`,
+    mail: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
+    download: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>`,
+    sun: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
+    github: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>`,
+    linkedin: `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>`,
+  } as const;
+
+  function setupCommandPalette() {
+    const root = document.getElementById("command-palette");
+    const input = document.getElementById("cmdk-input") as HTMLInputElement | null;
+    const list = document.getElementById("cmdk-list");
+    const trigger = document.getElementById("cmdk-trigger");
+    const modLabel = document.querySelector("[data-cmdk-mod]");
+
+    if (!root || !input || !list || !trigger) return;
+    if (root.dataset.ready === "1") return;
+    root.dataset.ready = "1";
+
+    const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform || "");
+    if (modLabel) modLabel.textContent = isMac ? "⌘" : "Ctrl";
+
+    let open = false;
+    let active = 0;
+    let filtered: CommandAction[] = [];
+
+    const go = (hash: string) => {
+      const path = window.location.pathname;
+      if (path === "/" || path.endsWith("/index.html") || path === "") {
+        window.location.hash = hash;
+      } else {
+        window.location.href = `/#${hash}`;
+      }
+    };
+
+    const actions: CommandAction[] = [
+      {
+        id: "about",
+        title: "About",
+        hint: "Jump to about section",
+        group: "Navigate",
+        keywords: "about me bio",
+        icon: ICONS.user,
+        run: () => go("about"),
+      },
+      {
+        id: "experience",
+        title: "Experience",
+        hint: "Jump to experience",
+        group: "Navigate",
+        keywords: "work career jobs",
+        icon: ICONS.briefcase,
+        run: () => go("experience"),
+      },
+      {
+        id: "skills",
+        title: "Skills",
+        hint: "Jump to skills",
+        group: "Navigate",
+        keywords: "stack tech go redis",
+        icon: ICONS.spark,
+        run: () => go("skills"),
+      },
+      {
+        id: "open-source",
+        title: "Open Source",
+        hint: "Jump to open source",
+        group: "Navigate",
+        keywords: "oss github projects",
+        icon: ICONS.git,
+        run: () => go("open-source"),
+      },
+      {
+        id: "projects",
+        title: "Projects",
+        hint: "Jump to featured projects",
+        group: "Navigate",
+        keywords: "work portfolio case",
+        icon: ICONS.folder,
+        run: () => go("projects"),
+      },
+      {
+        id: "articles",
+        title: "Articles",
+        hint: "Jump to articles",
+        group: "Navigate",
+        keywords: "blog medium writing",
+        icon: ICONS.pen,
+        run: () => go("articles"),
+      },
+      {
+        id: "contact",
+        title: "Contact",
+        hint: "Jump to contact form",
+        group: "Navigate",
+        keywords: "email message hire",
+        icon: ICONS.mail,
+        run: () => go("contact"),
+      },
+      {
+        id: "copy-email",
+        title: "Copy email",
+        hint: "talk@sagardash.me",
+        group: "Actions",
+        keywords: "mail clipboard copy",
+        icon: ICONS.mail,
+        run: async () => {
+          await navigator.clipboard.writeText("talk@sagardash.me");
+        },
+      },
+      {
+        id: "cv",
+        title: "Download CV",
+        hint: "Open resume in Drive",
+        group: "Actions",
+        keywords: "resume pdf download",
+        icon: ICONS.download,
+        run: () => {
+          window.open(
+            "https://drive.google.com/file/d/1AMJCy47vP3bqVHn_gX5yRgyi_hZUmI-f/view",
+            "_blank",
+            "noopener,noreferrer"
+          );
+        },
+      },
+      {
+        id: "theme",
+        title: "Toggle theme",
+        hint: "Switch light / dark mode",
+        group: "Actions",
+        keywords: "dark light mode appearance",
+        icon: ICONS.sun,
+        run: () => {
+          const isDark = document.documentElement.classList.contains("dark");
+          document.documentElement.classList[isDark ? "remove" : "add"]("dark");
+          localStorage.setItem("theme", isDark ? "light" : "dark");
+        },
+      },
+      {
+        id: "github",
+        title: "Open GitHub",
+        hint: "github.com/sagar290",
+        group: "Links",
+        keywords: "code repo",
+        icon: ICONS.github,
+        run: () =>
+          window.open("https://github.com/sagar290", "_blank", "noopener,noreferrer"),
+      },
+      {
+        id: "linkedin",
+        title: "Open LinkedIn",
+        hint: "Professional profile",
+        group: "Links",
+        keywords: "social network",
+        icon: ICONS.linkedin,
+        run: () =>
+          window.open(
+            "https://www.linkedin.com/in/sagardash1/",
+            "_blank",
+            "noopener,noreferrer"
+          ),
+      },
+    ];
+
+    const close = () => {
+      open = false;
+      root.hidden = true;
+      document.body.style.overflow = "";
+      input.value = "";
+      active = 0;
+    };
+
+    const openPalette = () => {
+      open = true;
+      root.hidden = false;
+      document.body.style.overflow = "hidden";
+      render("");
+      requestAnimationFrame(() => input.focus());
+    };
+
+    const groupOrder: CommandAction["group"][] = ["Navigate", "Actions", "Links"];
+
+    const render = (query: string) => {
+      const q = query.trim().toLowerCase();
+      filtered = actions.filter((action) => {
+        if (!q) return true;
+        return `${action.title} ${action.hint} ${action.group} ${action.keywords}`
+          .toLowerCase()
+          .includes(q);
+      });
+
+      if (active >= filtered.length) active = Math.max(0, filtered.length - 1);
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="cmdk-empty">No matches</div>`;
+        return;
+      }
+
+      let index = 0;
+      list.innerHTML = groupOrder
+        .map((group) => {
+          const items = filtered.filter((action) => action.group === group);
+          if (!items.length) return "";
+          const rows = items
+            .map((action) => {
+              const i = index++;
+              return `
+                <button
+                  type="button"
+                  class="cmdk-item"
+                  role="option"
+                  data-index="${i}"
+                  aria-selected="${i === active}"
+                  id="cmdk-option-${i}"
+                >
+                  <span class="cmdk-item-icon" aria-hidden="true">${action.icon}</span>
+                  <span class="cmdk-item-main">
+                    <span class="cmdk-item-title">${action.title}</span>
+                    <span class="cmdk-item-hint">${action.hint}</span>
+                  </span>
+                  <kbd class="cmdk-item-shortcut">↵</kbd>
+                </button>`;
+            })
+            .join("");
+          return `<section class="cmdk-group"><div class="cmdk-group-label">${group}</div>${rows}</section>`;
+        })
+        .join("");
+
+      list
+        .querySelector(`[data-index="${active}"]`)
+        ?.scrollIntoView({ block: "nearest" });
+    };
+
+    const runActive = async () => {
+      const action = filtered[active];
+      if (!action) return;
+      close();
+      await action.run();
+    };
+
+    const onKeydown = (event: KeyboardEvent) => {
+      const mod = event.metaKey || event.ctrlKey;
+      if (mod && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        if (open) close();
+        else openPalette();
+        return;
+      }
+
+      if (!open) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        return;
+      }
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        active = (active + 1) % Math.max(filtered.length, 1);
+        render(input.value);
+        return;
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        active =
+          (active - 1 + Math.max(filtered.length, 1)) %
+          Math.max(filtered.length, 1);
+        render(input.value);
+        return;
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        void runActive();
+      }
+    };
+
+    input.addEventListener("input", () => {
+      active = 0;
+      render(input.value);
+    });
+
+    list.addEventListener("mousemove", (event) => {
+      const button = (event.target as HTMLElement).closest(
+        ".cmdk-item"
+      ) as HTMLElement | null;
+      if (!button) return;
+      const next = Number(button.dataset.index || 0);
+      if (next === active) return;
+      active = next;
+      list.querySelectorAll(".cmdk-item").forEach((el) => {
+        el.setAttribute(
+          "aria-selected",
+          String(Number((el as HTMLElement).dataset.index) === active)
+        );
+      });
+    });
+
+    list.addEventListener("click", (event) => {
+      const button = (event.target as HTMLElement).closest(
+        ".cmdk-item"
+      ) as HTMLElement | null;
+      if (!button) return;
+      active = Number(button.dataset.index || 0);
+      void runActive();
+    });
+
+    root.querySelectorAll("[data-cmdk-close]").forEach((el) => {
+      el.addEventListener("click", close);
+    });
+
+    trigger.addEventListener("click", openPalette);
+    document.addEventListener("keydown", onKeydown);
+  }
+
+  document.addEventListener("astro:page-load", setupCommandPalette);
+</script>

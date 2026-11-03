@@ -3,12 +3,15 @@ import "../styles/global.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import SidebarTimeline from "../components/SidebarTimeline.astro";
+import CommandPalette from "../components/CommandPalette.astro";
 import { ClientRouter } from "astro:transitions";
 import {
   DEFAULT_SEO,
+  OG_IMAGE,
   PERSON_NAME,
   SITE_NAME,
   SITE_URL,
+  TWITTER_HANDLE,
   assetUrl,
   createDefaultStructuredData,
 } from "../lib/seo";
@@ -17,7 +20,11 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageAlt?: string;
   keywords?: string;
+  type?: "website" | "article" | "profile";
   structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
@@ -25,12 +32,17 @@ const {
   title = DEFAULT_SEO.title,
   description = DEFAULT_SEO.description,
   image = DEFAULT_SEO.image,
+  imageWidth = OG_IMAGE.width,
+  imageHeight = OG_IMAGE.height,
+  imageAlt = OG_IMAGE.alt,
   keywords = DEFAULT_SEO.keywords,
+  type = "website",
   structuredData,
 } = Astro.props;
 
 const faviconUrl = assetUrl("/avatar.png");
 const canonicalUrl = new URL(Astro.url.pathname, SITE_URL).toString();
+const absoluteImage = image.startsWith("http") ? image : assetUrl(image);
 const pageStructuredData = structuredData ?? createDefaultStructuredData();
 ---
 
@@ -39,6 +51,8 @@ const pageStructuredData = structuredData ?? createDefaultStructuredData();
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#e34a00" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" type="image/png" href={faviconUrl} />
     <link rel="icon" type="image/png" href={assetUrl("/favicon-96x96.png")} sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href={assetUrl("/favicon.svg")} />
@@ -153,20 +167,28 @@ const pageStructuredData = structuredData ?? createDefaultStructuredData();
     <meta name="description" content={description} />
     <meta name="keywords" content={keywords} />
     <meta name="author" content={PERSON_NAME} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <link rel="canonical" href={canonicalUrl} />
-    
-    <meta property="og:type" content="website" />
+
+    <meta property="og:type" content={type} />
     <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
+    <meta property="og:image" content={absoluteImage} />
+    <meta property="og:image:secure_url" content={absoluteImage} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
     <meta property="og:url" content={canonicalUrl} />
-    
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={TWITTER_HANDLE} />
+    <meta name="twitter:creator" content={TWITTER_HANDLE} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image" content={absoluteImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
@@ -220,6 +242,7 @@ const pageStructuredData = structuredData ?? createDefaultStructuredData();
         <Footer />
       </div>
     </main>
+    <CommandPalette />
 
     <style is:global>
       .main-content {

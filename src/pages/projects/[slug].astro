@@ -1,21 +1,52 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  PERSON_NAME,
+  assetUrl,
+  createPersonSchema,
+  createProjectSchema,
+} from "../../lib/seo";
 
 export async function getStaticPaths() {
-  const projectEntries = await getCollection('projects');
-  return projectEntries.map(entry => ({
-    params: { slug: entry.slug }, props: { entry },
+  const projectEntries = await getCollection("projects");
+  return projectEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
   }));
 }
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+
+const title = `${entry.data.title} | ${PERSON_NAME}`;
+const description = entry.data.description;
+const coverImage = entry.data.coverImage
+  ? assetUrl(entry.data.coverImage)
+  : undefined;
+
+const structuredData = [
+  createProjectSchema({
+    title: entry.data.title,
+    description: entry.data.description,
+    slug: entry.slug,
+    date: entry.data.date,
+    tags: entry.data.tags,
+    coverImage: entry.data.coverImage,
+  }),
+  createPersonSchema(),
+];
 ---
 
-<BaseLayout 
-  title={`${entry.data.title} | Projects`} 
-  description={entry.data.description}
+<BaseLayout
+  title={title}
+  description={description}
+  image={coverImage}
+  imageWidth={coverImage ? 1280 : undefined}
+  imageHeight={coverImage ? 720 : undefined}
+  imageAlt={entry.data.title}
+  type="article"
+  structuredData={structuredData}
 >
   <article class="project-layout animate-in">
     <header class="project-header">
@@ -23,27 +54,31 @@ const { Content } = await entry.render();
       <h1 class="project-title">{entry.data.title}</h1>
       <div class="project-meta">
         <time datetime={entry.data.date.toISOString()}>
-          {entry.data.date.toLocaleDateString('en-US', {
-            year: 'numeric', month: 'long', day: 'numeric'
-          })}
+          {
+            entry.data.date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
         </time>
         <div class="project-tags">
-          {entry.data.tags.map(tag => (
-            <span class="tag">{tag}</span>
-          ))}
+          {entry.data.tags.map((tag) => <span class="tag">{tag}</span>)}
         </div>
       </div>
-      {entry.data.coverImage && (
-        <img
-          src={entry.data.coverImage}
-          alt=""
-          class="cover-image"
-          width="1200"
-          height="630"
-          loading="lazy"
-          decoding="async"
-        />
-      )}
+      {
+        entry.data.coverImage && (
+          <img
+            src={entry.data.coverImage}
+            alt={`Cover image for ${entry.data.title}`}
+            class="cover-image"
+            width="1200"
+            height="630"
+            loading="eager"
+            decoding="async"
+          />
+        )
+      }
     </header>
 
     <div class="project-content">
@@ -85,6 +120,7 @@ const { Content } = await entry.render();
   .project-tags {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
   }
   .tag {
     background: var(--card-bg);
@@ -107,25 +143,23 @@ const { Content } = await entry.render();
     line-height: 1.8;
   }
   :global(.project-content h2) {
-    margin-top: 3rem;
+    margin-top: 2.5rem;
     margin-bottom: 1rem;
-    font-size: 1.8rem;
-    font-weight: 700;
-  }
-  :global(.project-content h3) {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-size: 1.4rem;
-    font-weight: 600;
+    font-size: 1.5rem;
   }
   :global(.project-content p) {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
   }
-  :global(.project-content ul, .project-content ol) {
-    margin-bottom: 1.5rem;
+  :global(.project-content ul),
+  :global(.project-content ol) {
+    margin-bottom: 1.25rem;
     padding-left: 1.5rem;
   }
   :global(.project-content li) {
     margin-bottom: 0.5rem;
+  }
+  :global(.project-content a) {
+    color: var(--brand-color);
+    text-decoration: underline;
   }
 </style>
