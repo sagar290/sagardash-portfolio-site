@@ -236,15 +236,49 @@ const homeStructuredData = createProfilePageSchema(
     <div class="about-wrapper reveal">
       <h2 class="section-title">About Me</h2>
 
-      <div class="about-highlights">
-        <AboutContent />
-        <h3 class="highlights-heading">Core Focus</h3>
-        <ul class="highlights-list">
-          <li class="highlight-item">Microservices Architecture</li>
-          <li class="highlight-item">High-Availability Systems</li>
-          <li class="highlight-item">Event-Driven Design</li>
-          <li class="highlight-item">Cloud Infrastructure</li>
-        </ul>
+      <div class="about-layout">
+        <div class="about-copy">
+          <AboutContent />
+          <div class="about-stack" aria-label="Primary tools">
+            {
+              ["Go", "Kubernetes", "Redis", "RabbitMQ", "PostgreSQL", "AWS"].map(
+                (item) => <span class="about-chip">{item}</span>
+              )
+            }
+          </div>
+        </div>
+
+        <aside class="about-focus" aria-label="Core focus">
+          <h3 class="highlights-heading">Core Focus</h3>
+          <ul class="focus-grid">
+            <li class="focus-card">
+              <span class="focus-title">Microservices</span>
+              <span class="focus-desc"
+                >Service boundaries that stay clear as systems grow.</span
+              >
+            </li>
+            <li class="focus-card">
+              <span class="focus-title">High Availability</span>
+              <span class="focus-desc"
+                >Designs built for failure, recovery, and uptime.</span
+              >
+            </li>
+            <li class="focus-card">
+              <span class="focus-title">Event-Driven</span>
+              <span class="focus-desc"
+                >Async flows that absorb spikes without blocking the core
+                path.</span
+              >
+            </li>
+            <li class="focus-card">
+              <span class="focus-title">Cloud Infrastructure</span>
+              <span class="focus-desc"
+                >Containers, caches, and queues wired for real production
+                load.</span
+              >
+            </li>
+          </ul>
+        </aside>
       </div>
     </div>
   </section>
@@ -653,48 +687,125 @@ const homeStructuredData = createProfilePageSchema(
     position: relative;
   }
 
-  .about-highlights {
+  .about-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr);
+    gap: 2.5rem 3rem;
+    align-items: start;
+  }
+
+  .about-copy {
     font-size: 1.1rem;
     line-height: 1.8;
-    max-width: 42rem;
+  }
+
+  :global(.about-copy p) {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    opacity: 0.92;
+  }
+
+  .about-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .about-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted-color);
+  }
+
+  .about-focus {
+    position: relative;
   }
 
   .highlights-heading {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
     font-weight: 700;
-    margin: 1.75rem 0 0.75rem;
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted-color);
   }
 
-  .highlights-list {
+  .focus-grid {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 0.5rem 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
   }
 
-  .highlight-item {
-    position: relative;
-    padding-left: 1.1rem;
-    font-size: 0.95rem;
+  .focus-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem 1.05rem;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    background: var(--card-bg);
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .focus-card:hover {
+    border-color: rgba(var(--brand-rgb), 0.55);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  .focus-title {
+    font-family: var(--font-display);
+    font-size: 0.98rem;
+    font-weight: 700;
     color: var(--text-color);
-    opacity: 0.9;
+    position: relative;
+    padding-left: 0.9rem;
   }
 
-  .highlight-item::before {
+  .focus-title::before {
     content: "";
     position: absolute;
     left: 0;
-    top: 0.55em;
+    top: 0.4em;
     width: 6px;
     height: 6px;
     border-radius: 50%;
     background: var(--brand-color);
   }
 
-  :global(.about-highlights p) {
-    margin-bottom: 0.75rem;
+  .focus-desc {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: var(--muted-color);
+  }
+
+  @media (max-width: 900px) {
+    .about-layout {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .focus-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .focus-card:hover {
+      transform: none;
+    }
   }
 
   /* Experience Timeline */
