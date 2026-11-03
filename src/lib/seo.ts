@@ -9,8 +9,8 @@ export const TWITTER_HANDLE = "@Sagar290";
 
 export const OG_IMAGE = {
   url: `${SITE_URL}/og-image.png`,
-  width: 640,
-  height: 640,
+  width: 1200,
+  height: 630,
   alt: `${PERSON_NAME} — ${JOB_TITLE}`,
 };
 
