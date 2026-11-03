@@ -24,7 +24,7 @@ const { class: className = Astro.props.className || "" } = Astro.props;
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
-    opacity: 0.045;
+    opacity: 0.05;
     animation: float 20s ease-in-out infinite;
   }
 
@@ -73,7 +73,7 @@ const { class: className = Astro.props.className || "" } = Astro.props;
   }
 
   :global(.dark) .gradient-blob {
-    opacity: 0.08;
+    opacity: 0.12;
   }
 
   @media (prefers-reduced-motion: reduce) {

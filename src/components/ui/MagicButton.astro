@@ -13,7 +13,7 @@ const {
 
 const isSecondary = variant === "secondary";
 const primaryClass =
-  "magic-button group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full px-8 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--brand-color)]";
+  "magic-button inline-flex h-12 items-center justify-center rounded-full px-8 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--brand-color)]";
 const secondaryClass = "btn-secondary";
 const classes = `${className} ${isSecondary ? secondaryClass : primaryClass}`.trim();
 ---
@@ -21,7 +21,6 @@ const classes = `${className} ${isSecondary ? secondaryClass : primaryClass}`.tr
 {
   href ? (
     <a href={href} target={target} rel={rel} class={classes}>
-      {!isSecondary && <span class="magic-spin" aria-hidden="true" />}
       <span class="magic-label">
         {position === "left" && icon && <span class="mr-2">{icon}</span>}
         <slot />
@@ -30,7 +29,6 @@ const classes = `${className} ${isSecondary ? secondaryClass : primaryClass}`.tr
     </a>
   ) : (
     <button id={id} type={type} class={classes}>
-      {!isSecondary && <span class="magic-spin" aria-hidden="true" />}
       <span class="magic-label">
         {position === "left" && icon && <span class="mr-2">{icon}</span>}
         <slot />
@@ -43,6 +41,7 @@ const classes = `${className} ${isSecondary ? secondaryClass : primaryClass}`.tr
 <style>
   .magic-button {
     position: relative;
+    overflow: hidden;
     text-decoration: none;
     color: #fff;
     background: var(--brand-color);
@@ -51,10 +50,34 @@ const classes = `${className} ${isSecondary ? secondaryClass : primaryClass}`.tr
     transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   }
 
+  .magic-button::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.28) 50%,
+      transparent 60%
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+
   .magic-button:hover {
     transform: translateY(-1px);
-    filter: brightness(1.05);
+    filter: brightness(1.06);
     box-shadow: 0 10px 24px rgba(var(--brand-rgb), 0.34);
+  }
+
+  .magic-button:hover::before {
+    animation: btnShine 0.75s ease;
+  }
+
+  @keyframes btnShine {
+    to {
+      transform: translateX(120%);
+    }
   }
 
   .magic-button:active {
@@ -67,74 +90,21 @@ const classes = `${className} ${isSecondary ? secondaryClass : primaryClass}`.tr
     transform: none;
   }
 
-  .magic-spin {
-    display: none;
-  }
-
   .magic-label {
-    position: relative;
-    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-
-  /* Dark mode keeps the spinning border treatment */
-  :global(.dark) .magic-button {
-    padding: 1px;
-    background: transparent;
-    box-shadow: none;
-    filter: none;
-  }
-
-  :global(.dark) .magic-spin {
-    display: block;
-    position: absolute;
-    inset: -1000%;
-    animation: spin 2s linear infinite;
-    background: conic-gradient(
-      from 90deg at 50% 50%,
-      #ffb380 0%,
-      #002050 50%,
-      #f05000 100%
-    );
-  }
-
-  :global(.dark) .magic-label {
     width: 100%;
     height: 100%;
-    border-radius: 9999px;
-    background: #0f172a;
-    padding: 0 2rem;
-    transition: background 0.2s ease;
-  }
-
-  :global(.dark) .magic-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(var(--brand-rgb), 0.22);
-    filter: none;
-  }
-
-  :global(.dark) .magic-button:hover .magic-label {
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .magic-spin {
-      animation: none !important;
-    }
-
     .magic-button:hover {
       transform: none;
+    }
+
+    .magic-button:hover::before {
+      animation: none;
     }
   }
 </style>
