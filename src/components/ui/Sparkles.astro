@@ -102,23 +102,37 @@ const {
     --delay: calc(var(--min-delay) + var(--index) * 0.3s);
     --duration: calc(var(--min-duration) + var(--index) * 0.4s);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sparkles-container {
+      display: none;
+    }
+  }
 </style>
 
 <script>
-  const container = document.querySelector('.sparkles-container') as HTMLElement;
-  const particleDensity = parseInt(container?.style.getPropertyValue('--particle-density') || '100');
-  
-  if (container) {
-    const rect = container.getBoundingClientRect();
-    const numParticles = Math.floor((rect.width * rect.height) / (particleDensity * particleDensity));
-    
-    for (let i = 0; i < numParticles; i++) {
-      const sparkle = document.createElement('div');
-      sparkle.className = 'sparkle';
-      sparkle.style.setProperty('--index', i.toString());
-      sparkle.style.left = `${Math.random() * 100}%`;
-      sparkle.style.top = `${Math.random() * 100}%`;
-      container.appendChild(sparkle);
-    }
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const containers = document.querySelectorAll(".sparkles-container");
+
+  if (!prefersReduced) {
+    containers.forEach((container) => {
+      const el = container as HTMLElement;
+      const particleDensity = parseInt(
+        el.style.getPropertyValue("--particle-density") || "100"
+      );
+      const rect = el.getBoundingClientRect();
+      const numParticles = Math.floor(
+        (rect.width * rect.height) / (particleDensity * particleDensity)
+      );
+
+      for (let i = 0; i < Math.min(numParticles, 24); i++) {
+        const sparkle = document.createElement("div");
+        sparkle.className = "sparkle";
+        sparkle.style.setProperty("--index", i.toString());
+        sparkle.style.left = `${Math.random() * 100}%`;
+        sparkle.style.top = `${Math.random() * 100}%`;
+        el.appendChild(sparkle);
+      }
+    });
   }
 </script>

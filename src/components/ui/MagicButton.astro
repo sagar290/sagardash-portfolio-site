@@ -6,36 +6,32 @@ const {
   href,
   target,
   rel,
+  type = "button",
+  variant = "primary",
+  id,
 } = Astro.props;
+
+const isSecondary = variant === "secondary";
+const primaryClass =
+  "magic-button group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full px-8 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--brand-color)]";
+const secondaryClass = "btn-secondary";
+const classes = `${className} ${isSecondary ? secondaryClass : primaryClass}`.trim();
 ---
 
 {
   href ? (
-    <a
-      href={href}
-      target={target}
-      rel={rel}
-      class={
-        className +
-        " magic-button-link group relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-slate-900"
-      }
-    >
-      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-      <span class="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-1 text-sm font-medium text-white backdrop-blur-3xl group-hover:bg-slate-900 transition-all duration-300">
+    <a href={href} target={target} rel={rel} class={classes}>
+      {!isSecondary && <span class="magic-spin" aria-hidden="true" />}
+      <span class="magic-label">
         {position === "left" && icon && <span class="mr-2">{icon}</span>}
         <slot />
         {position === "right" && icon && <span class="ml-2">{icon}</span>}
       </span>
     </a>
   ) : (
-    <button
-      class={
-        className +
-        " magic-button group relative inline-flex h-12 overflow-hidden rounded-full p-[1px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-50 focus:ring-slate-900"
-      }
-    >
-      <span class="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
-      <span class="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-8 py-1 text-sm font-medium text-white backdrop-blur-3xl group-hover:bg-slate-900 transition-all duration-300">
+    <button id={id} type={type} class={classes}>
+      {!isSecondary && <span class="magic-spin" aria-hidden="true" />}
+      <span class="magic-label">
         {position === "left" && icon && <span class="mr-2">{icon}</span>}
         <slot />
         {position === "right" && icon && <span class="ml-2">{icon}</span>}
@@ -45,36 +41,82 @@ const {
 }
 
 <style>
-  .magic-button,
-  .magic-button-link {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  .magic-button {
+    position: relative;
     text-decoration: none;
+    color: #fff;
+    background: var(--brand-color);
+    border: none;
+    box-shadow: 0 6px 18px rgba(var(--brand-rgb), 0.28);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
   }
 
-  .magic-button:hover,
-  .magic-button-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 112, 243, 0.3);
+  .magic-button:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 10px 24px rgba(var(--brand-rgb), 0.34);
   }
 
-  .magic-button:active,
-  .magic-button-link:active {
+  .magic-button:active {
     transform: translateY(0);
   }
 
-  .magic-button span:last-child:hover,
-  .magic-button-link span:last-child:hover {
-    background: rgba(15, 23, 42, 0.9);
+  .magic-button:disabled {
+    opacity: 0.65;
+    pointer-events: none;
+    transform: none;
   }
 
-  :global(.dark) .magic-button span:last-child,
-  :global(.dark) .magic-button-link span:last-child {
-    background: #0f172a; /* Same as slate-900 or use var(--bg-color) */
+  .magic-spin {
+    display: none;
   }
 
-  :global(.dark) .magic-button span:last-child:hover,
-  :global(.dark) .magic-button-link span:last-child:hover {
-    background: rgba(255, 255, 255, 0.1);
+  .magic-label {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Dark mode keeps the spinning border treatment */
+  :global(.dark) .magic-button {
+    padding: 1px;
+    background: transparent;
+    box-shadow: none;
+    filter: none;
+  }
+
+  :global(.dark) .magic-spin {
+    display: block;
+    position: absolute;
+    inset: -1000%;
+    animation: spin 2s linear infinite;
+    background: conic-gradient(
+      from 90deg at 50% 50%,
+      #ffb380 0%,
+      #002050 50%,
+      #f05000 100%
+    );
+  }
+
+  :global(.dark) .magic-label {
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    background: #0f172a;
+    padding: 0 2rem;
+    transition: background 0.2s ease;
+  }
+
+  :global(.dark) .magic-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(var(--brand-rgb), 0.22);
+    filter: none;
+  }
+
+  :global(.dark) .magic-button:hover .magic-label {
+    background: rgba(255, 255, 255, 0.08);
   }
 
   @keyframes spin {
@@ -83,6 +125,16 @@ const {
     }
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .magic-spin {
+      animation: none !important;
+    }
+
+    .magic-button:hover {
+      transform: none;
     }
   }
 </style>

@@ -171,11 +171,11 @@ const pageStructuredData = structuredData ?? createDefaultStructuredData();
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify(pageStructuredData)} />
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Syne + DM Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
 
@@ -211,8 +211,9 @@ const pageStructuredData = structuredData ?? createDefaultStructuredData();
     <ClientRouter />
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <SidebarTimeline />
-    <main id="home"   class="main-content">
+    <main id="main-content" class="main-content">
       <div class="content-inner container">
         <Header />
         <slot />

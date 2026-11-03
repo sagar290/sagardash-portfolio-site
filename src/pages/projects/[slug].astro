@@ -34,7 +34,15 @@ const { Content } = await entry.render();
         </div>
       </div>
       {entry.data.coverImage && (
-        <img src={entry.data.coverImage} alt={entry.data.title} class="cover-image" />
+        <img
+          src={entry.data.coverImage}
+          alt=""
+          class="cover-image"
+          width="1200"
+          height="630"
+          loading="lazy"
+          decoding="async"
+        />
       )}
     </header>
 
@@ -91,6 +99,7 @@ const { Content } = await entry.render();
     height: auto;
     border-radius: 12px;
     margin-bottom: 3rem;
+    filter: saturate(0.82) contrast(0.96) brightness(0.92);
   }
 
   .project-content {

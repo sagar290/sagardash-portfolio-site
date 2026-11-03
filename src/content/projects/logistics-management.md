@@ -3,6 +3,7 @@ title: "Logistics Management"
 description: "Engineered a real-time Go backend with Redis to optimize vehicle allocation and tracking reliability."
 date: 2022-07-20
 tags: ["Go", "Redis", "Real-time", "Optimization"]
+coverImage: "/projects/logistics-management.jpg"
 ---
 
 ### Company: Pathao
